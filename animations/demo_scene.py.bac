@@ -1,0 +1,57 @@
+import manim as mn
+from manim_revealjs import PresentationScene, COMPLETE_LOOP
+
+
+mn.config.video_dir= "./videos"
+
+class DemoScene(PresentationScene):
+    def construct(self):
+        # TODO find out why end_fragment has the t parameter
+        rect = mn.Rectangle(fill_color=mn.BLUE, fill_opacity=1)
+        circle = mn.Circle()
+        circle.set_fill(mn.PINK, opacity=1)
+        self.play(mn.Create(rect))
+        self.end_fragment()
+
+        self.play(rect.animate.shift(mn.UP).rotate(mn.PI / 3))
+        #self.end_fragment(fragment_type=COMPLETE_LOOP)
+        #self.end_fragment()
+
+        self.play(rect.animate.shift(3*mn.LEFT))
+        self.play(rect.animate.shift(mn.UP).rotate(-2*mn.PI / 3))
+        self.play(rect.animate.shift(3*mn.RIGHT))
+        self.end_fragment()
+
+        self.play(rect.animate.shift(mn.DOWN).rotate(mn.PI /3))
+        self.end_fragment()
+        self.play(mn.Transform(rect, circle))
+        self.end_fragment()
+
+        circle_2 = mn.Circle(fill_color=mn.BLUE, fill_opacity=1)
+        circle_2.set_fill(mn.BLUE)
+        circle_2.shift(3*mn.RIGHT)
+        self.play(rect.animate.shift(3*mn.LEFT), mn.Create(circle_2))
+        self.end_fragment()
+
+        self.play(mn.FadeOut(rect, scale=0.1))
+        
+        line_1 = mn.CubicBezier(start_anchor=[0, 0, 0], start_handle=[0.5, 0, 0], end_handle=[0.5, 0, 0], end_anchor=[1, 0, 0])
+        line_2 = mn.CubicBezier(start_anchor=[0, 0, 0], start_handle=[0.5, 0.5, 0], end_handle=[0.5, 0.5, 0], end_anchor=[0, 1, 0])
+        line_3 = mn.CubicBezier(start_anchor=[0, 0, 0], start_handle=[-0.5, 0, 0], end_handle=[-0.5, 0, 0], end_anchor=[-1, 0, 0])
+        line_4 = mn.CubicBezier(start_anchor=[0, 0, 0], start_handle=[-0.5, 0.5, 0], end_handle=[-0.5, 0.5, 0], end_anchor=[0, 1, 0])
+
+        dot_1 = mn.Dot(point=[0, 0, 0])
+        dot_2 = mn.Dot(point=[1, 0, 0])
+        dot_3 = mn.Dot(point=[-1, 0, 0])
+
+        self.play(mn.Create(dot_1), mn.Create(dot_2), mn.Create(dot_3))
+        self.play(mn.Create(line_1), mn.Create(line_3))
+        self.end_fragment()
+
+        self.play(dot_2.animate.move_to([0, 1, 0]), dot_3.animate.move_to([0, 1, 0]), mn.Transform(line_1, line_2), mn.Transform(line_3, line_4))
+        self.end_fragment()
+
+
+
+
+
