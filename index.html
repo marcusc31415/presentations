@@ -18,12 +18,14 @@
 			<div class="slides">
 				<section class="fv-background" fv-video="animations/videos/DemoScene3.mp4" fv-playback-info="animations/videos/DemoScene3.json" data-background-size="contain" data-background-color="black">
 				</section>
-				<section>
-					<h3>Slide 2</h3>
-					<video class="fv-video" src="animations/videos/DemoScene3.mp4" fv-playback-info="animations/videos/DemoScene3.json"></video>
+				<section class="fv-background" fv-video="animations/videos/DemoScene4.mp4" fv-playback-info="animations/videos/DemoScene4.json" data-background-size="contain" data-background-color="black">
 				</section>
 				<section>
 					<h3>Slide 3</h3>
+					<video class="fv-video" src="animations/videos/DemoScene3.mp4" fv-playback-info="animations/videos/DemoScene3.json"></video>
+				</section>
+				<section>
+					<h3>Slide 4</h3>
 				</section>
 			</div>
 		</div>
@@ -40,6 +42,7 @@
 			Reveal.initialize({
 				hash: true,
 				autoPlayMedia: false,
+				backgroundTransition: 'none',
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealManim ]
 			});
