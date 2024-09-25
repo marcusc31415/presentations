@@ -64,7 +64,6 @@ class DemoScene4(PresentationScene):
         arrow = mn.Arrow(start=mn.LEFT*0.8, end=mn.RIGHT*0.9)
         arrow_label = mn.Tex(r"$\alpha$")
         arrow_label.move_to(mn.UP*0.5)
-        self.play(mn.LaggedStart(mn.GrowArrow(arrow), mn.Write(arrow_label), lag_ratio=0.5))
 
         circle_2 = mn.Circle(radius=3, color=mn.PURE_GREEN, stroke_color=mn.WHITE, fill_opacity=0.6)
         circle_2.move_to(4*mn.RIGHT)
@@ -90,20 +89,13 @@ class DemoScene4(PresentationScene):
                 subgroup_label_2
                 )
 
-        self.play(mn.Create(circle_2), mn.Write(circle_2_label))
+
+        animations = [mn.GrowFromPoint(obj, mn.LEFT*0.7) for obj in group_2]
+
+        self.play(mn.LaggedStart(mn.GrowArrow(arrow), 
+            mn.Write(arrow_label), 
+            mn.AnimationGroup(*animations), 
+            lag_ratio=0.2), 
+            )
         self.end_fragment()
-
-        rect_1_new = rect_1.copy()
-
-        self.play(mn.Transform(rect_1_new, rect_2))
-        self.play(mn.Write(subgroup_label_2))
-        self.play(mn.GrowFromCenter(brace_r_2), mn.GrowFromCenter(brace_d_2))
-        self.end_fragment()
-
-
-
-
-
-
-
 
