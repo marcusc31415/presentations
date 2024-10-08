@@ -12,6 +12,9 @@ class DemoScene5(PresentationScene):
         colours = {0: mn.RED, 1: mn.BLUE, 2: mn.GREEN}
         back_colours = {str(mn.RED): 0, str(mn.BLUE): 1, str(mn.GREEN): 2}
 
+        line_groups = [mn.VGroup() for _ in range(0, 3)]
+
+
         full_dots = []
         dot_points = []
 
@@ -26,8 +29,9 @@ class DemoScene5(PresentationScene):
         temp_angles = []
         angle = np.pi/6
         for i in range(0, 3):
-            temp_lines.append(mn.Line(start=mn.ORIGIN, end=mn.RIGHT*np.cos(angle + (i)*2*np.pi/3) + mn.UP*np.sin(angle + (i)*2*np.pi/3), color=colours[i]))
+            temp_lines.append(mn.Line(start=mn.ORIGIN, end=2.5*(mn.RIGHT*np.cos(angle + (i)*2*np.pi/3) + mn.UP*np.sin(angle + (i)*2*np.pi/3)), color=colours[i]))
             temp_angles.append(angle + (i)*2*np.pi/3)
+            line_groups[i].add(temp_lines[i])
         full_lines.append(temp_lines)
         angles.append(temp_angles)
 
@@ -36,32 +40,49 @@ class DemoScene5(PresentationScene):
         dot_points.append(dot_prev)
         dot_points.append(dot_current)
 
-        for radius in range(0, 1):
+        for radius in range(0, 4):
             for i, dot in enumerate(full_dots[dot_prev:dot_current]):
-                for j, line in enumerate(full_lines[i]): # Each line attached to dot.
+                for j, line in enumerate(full_lines[i+dot_prev]): # Each line attached to dot.
                     new_lines = []
                     new_angles = []
                     full_dots.append(mn.Dot(point=line.end, z_index=1)) # Create a new dot at the end of the line.
-                    angle = np.pi-angles[i][j] # The angle the existing line goes out from the new dot.
+                    #angle = np.pi-angles[i][j] # The angle the existing line goes out from the new dot.
                     start_colour = back_colours[str(line.color)] # Starting index for the colours (colour of the existing line)
+                    direction_vec = line.start - line.end
+                    direction_vec = direction_vec / (1.5)
+                    angle = (2+radius+1)*np.pi/(3+radius+1)
+                    angle2 = 2*np.pi/(3+radius+1)
+                    direction_vec = mn.RIGHT * (direction_vec[0]*np.cos(angle) - direction_vec[1]*np.sin(angle)) + \
+                                    mn.UP * (direction_vec[0]*np.sin(angle) + direction_vec[1]*np.cos(angle))
                     for it in range(0, 2):
-                        print(line.end)
-                        print(angles[i][j])
-                        print(angle)
-                        print("-===-")
-                        end_point = mn.RIGHT*np.cos(angle + (it+1)*2*np.pi/3) + mn.UP*np.sin(angle + (it+1)*2*np.pi/3)
-                        new_angles.append(angle + (it+1)*2*np.pi/3)
-                        print(end_point)
-                        new_lines.append(mn.Line(start=line.end, end=line.end + end_point, color=colours[(start_colour+it+1) % 3]))
+                        if it != 0:
+                            direction_vec = mn.RIGHT * (direction_vec[0]*np.cos(angle2) - direction_vec[1]*np.sin(angle2)) + \
+                                            mn.UP * (direction_vec[0]*np.sin(angle2) + direction_vec[1]*np.cos(angle2))
+                        #new_angles.append(angle + (it+1)*2*np.pi/3)
+                        new_lines.append(mn.Line(start=line.end, end=line.end + direction_vec, color=colours[(start_colour+it+1) % 3]))
+                        line_groups[(start_colour+it+1) % 3].add(new_lines[it])
                     full_lines.append(new_lines)
                     angles.append(new_angles)
             dot_prev = dot_current
-            dot_current = len(full_dots)-1
+            dot_current = len(full_dots)
             dot_points.append(dot_current)
 
         self.play(*[mn.Create(i) for i in full_dots])
-        for i in full_lines:
-            self.play(*[mn.Create(j) for j in i])
+
+        for i, _ in enumerate(dot_points[:-1]):
+            dot_current = dot_points[i]
+            dot_next = dot_points[i+1]
+            line_list = []
+            for lines in full_lines[dot_current:dot_next]:
+                line_list = line_list + lines
+            self.play(*[mn.Create(i) for i in line_list])
+        self.end_fragment()
+
+        self.play(mn.Wiggle(line_groups[0], scale_value=1.05))
+        self.end_fragment()
+
+        circ = mn.Circle(radius=1)
+        self.play(mn.Transform(line_groups[0], circ))
         self.end_fragment()
 
 
