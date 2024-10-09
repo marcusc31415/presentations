@@ -5,6 +5,7 @@ from manim_revealjs import PresentationScene, COMPLETE_LOOP
 
 mn.config.video_dir= "./videos"
 
+
 class DemoScene5(PresentationScene):
     def construct(self):
 
@@ -13,13 +14,15 @@ class DemoScene5(PresentationScene):
         back_colours = {str(mn.RED): 0, str(mn.BLUE): 1, str(mn.GREEN): 2}
 
         line_groups = [mn.VGroup() for _ in range(0, 3)]
-
+        
+        dot_group = mn.VGroup()
 
         full_dots = []
         dot_points = []
 
         dot = mn.Dot(point=mn.ORIGIN)
         full_dots.append(dot)
+        dot_group.add(dot)
         full_dots[0].z_index=1
 
         full_lines = []
@@ -46,6 +49,7 @@ class DemoScene5(PresentationScene):
                     new_lines = []
                     new_angles = []
                     full_dots.append(mn.Dot(point=line.end, z_index=1)) # Create a new dot at the end of the line.
+                    dot_group.add(full_dots[-1])
                     #angle = np.pi-angles[i][j] # The angle the existing line goes out from the new dot.
                     start_colour = back_colours[str(line.color)] # Starting index for the colours (colour of the existing line)
                     direction_vec = line.start - line.end
@@ -58,7 +62,6 @@ class DemoScene5(PresentationScene):
                         if it != 0:
                             direction_vec = mn.RIGHT * (direction_vec[0]*np.cos(angle2) - direction_vec[1]*np.sin(angle2)) + \
                                             mn.UP * (direction_vec[0]*np.sin(angle2) + direction_vec[1]*np.cos(angle2))
-                        #new_angles.append(angle + (it+1)*2*np.pi/3)
                         new_lines.append(mn.Line(start=line.end, end=line.end + direction_vec, color=colours[(start_colour+it+1) % 3]))
                         line_groups[(start_colour+it+1) % 3].add(new_lines[it])
                     full_lines.append(new_lines)
@@ -67,7 +70,8 @@ class DemoScene5(PresentationScene):
             dot_current = len(full_dots)
             dot_points.append(dot_current)
 
-        self.play(*[mn.Create(i) for i in full_dots])
+        #self.play(*[mn.Create(i) for i in full_dots])
+
 
         for i, _ in enumerate(dot_points[:-1]):
             dot_current = dot_points[i]
@@ -75,14 +79,48 @@ class DemoScene5(PresentationScene):
             line_list = []
             for lines in full_lines[dot_current:dot_next]:
                 line_list = line_list + lines
-            self.play(*[mn.Create(i) for i in line_list])
+            self.play(*[mn.Create(i) for i in full_dots[dot_current:dot_next]], rate_func=mn.rate_functions.linear, run_time=0.5)
+            self.play(*[mn.Create(i) for i in line_list], rate_func=mn.rate_functions.linear, run_time=0.75)
+
+        text_group = mn.VGroup()
+
+        for line_list in full_lines[dot_current:dot_next]:
+            for line in line_list:
+                dots = mn.Text("\u22ef")
+                line_dir = line.end - line.start
+                angle = np.arctan2(line_dir[1], line_dir[0])
+                dots.rotate(angle + np.pi)
+                buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+                dots.move_to((line.end + line.start)/2 + buffer)
+                text_group.add(dots)
+
+        self.play(*[mn.Write(text) for text in text_group], rate_func=mn.rate_functions.linear)
         self.end_fragment()
 
-        self.play(mn.Wiggle(line_groups[0], scale_value=1.05))
+        self.play(mn.ShowPassingFlash(line_groups[0].copy().set_color(mn.YELLOW)), run_time=2)
         self.end_fragment()
 
-        circ = mn.Circle(radius=1)
-        self.play(mn.Transform(line_groups[0], circ))
+        lad_dot = mn.Dot(point=mn.ORIGIN)
+
+        def rotate_point(point, angle):
+            return mn.RIGHT * (point[0]*np.cos(angle) - point[1]*np.sin(angle)) + mn.UP * (point[0]*np.sin(angle) + point[1]*np.cos(angle))
+
+        bez_point1 = 2*(mn.UP + 0.5*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 0.5*mn.LEFT)
+        blue_curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.BLUE)
+        red_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, np.pi/3), rotate_point(bez_point2, np.pi/3), mn.ORIGIN, color=mn.RED)
+        green_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, -np.pi/3), rotate_point(bez_point2, -np.pi/3), mn.ORIGIN, color=mn.GREEN)
+
+        animations = [
+                mn.Transform(line_groups[0], red_curve),
+                mn.Transform(line_groups[1], blue_curve),
+                mn.Transform(line_groups[2], green_curve),
+                mn.Transform(dot_group, lad_dot),
+                mn.Transform(text_group, lad_dot)
+                ]
+
+        self.play(mn.AnimationGroup(*animations), run_time=3)
+
         self.end_fragment()
 
 
@@ -188,3 +226,30 @@ class DemoScene5(PresentationScene):
         #    )
         #self.end_fragment()
 
+class Test(PresentationScene):
+    def construct(self):
+        dot1 = mn.Dot(mn.ORIGIN)
+        dot2 = mn.Dot(mn.RIGHT)
+        line2 = mn.Line(start=mn.ORIGIN, end=mn.RIGHT)
+        self.play(mn.Create(dot1), mn.Create(dot2))
+
+        self.end_fragment()
+
+        wave_func = lambda t: np.array([t, 0*np.sin(t * 2 * np.pi), 0])
+
+        line = mn.ParametricFunction(wave_func)
+
+        value = mn.ValueTracker(0)
+
+        def transversal_movement(mob, tracker):
+            def movement_updater(mob):
+                new_func = lambda t: np.array([t, np.sin(t * 2 * np.pi)*np.sin(2 * np.pi * tracker.get_value()), 0])
+                mob.become(mn.ParametricFunction(new_func))
+            mob.add_updater(movement_updater)
+
+        transversal_movement(line, value)
+        self.play(mn.Create(line))
+        self.play(value.animate.set_value(2))
+        self.remove(line)
+        self.wait(1)
+        self.end_fragment()
