@@ -10,3 +10,4 @@ tmp/**
 node_modules/
 .sass-cache
 animations/videos/partial_movie_files/**
+**/partial_movie_files/**
