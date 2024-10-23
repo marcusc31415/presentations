@@ -28,7 +28,7 @@ Hakim's open source work is supported by <a href="https://github.com/sponsors/ha
         </div>
         <b>Your app, enterprise-ready.</b>
         <div>
-          <sub>Start selling to enterprise customers with just a few lines of code. Add Single Sign-On (and more) in minutes instead of months.</sup>
+          <sub>tStart selling to enterprise customers with just a few lines of code. Add Single Sign-On (and more) in minutes instead of months.</sup>
         </div>
       </a>
     </td>
