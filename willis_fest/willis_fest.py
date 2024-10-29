@@ -159,17 +159,25 @@ class PropertyP(PresentationScene):
         vertices = [mn.Dot(mn.LEFT*i*2) for i in range(-1*START_NO + 1, 0, -1)] + [mn.Dot(mn.ORIGIN)] + [mn.Dot(mn.RIGHT*i*2) for i in range(1, -1*START_NO + 2)]
         edges = [mn.Line(start=d1.get_center(), end=d2.get_center()) for d1, d2 in zip(vertices[:-1], vertices[1:])]
 
-        self.play(*[mn.Create(v) for v in vertices])
-        self.play(*[mn.Create(e) for e in edges])
-        self.end_fragment()
+        end_group = mn.VGroup()
+
+        for v in vertices:
+            end_group.add(v)
+        for e in edges:
+            end_group.add(e)
+        self.play(mn.GrowFromPoint(end_group, mn.ORIGIN))
+
+
+        #self.play(*[mn.Create(v) for v in vertices])
+        #self.play(*[mn.Create(e) for e in edges])
 
         branch_vertices = []
         branch_edges = []
         ellipses_groups = []
 
-        for vert_no, base_vertex in enumerate(vertices[1:-1]):
+        for vert_no, base_vertex in enumerate(vertices):
             SCALE_FACTOR = 0.75
-            if vert_no % 2 == 1:
+            if vert_no % 2 == 0:
                 direction = 1
             else:
                 direction = -1
@@ -203,41 +211,74 @@ class PropertyP(PresentationScene):
         ee = []
         tt = []
 
-        for vert, edge, text in zip(branch_vertices, branch_edges, ellipses_groups):
-            #self.play(*[mn.Create(v) for v in vert])
-            #self.play(*[mn.Create(e) for e in edge])
-            #self.play(*[mn.Create(t) for t in text])
+        animations = []
+        for base, vert, edge, text in zip(vertices, branch_vertices, branch_edges, ellipses_groups):
+            for v in vert:
+                animations.append(mn.GrowFromPoint(v, base.get_center()))
+            for e in edge:
+                animations.append(mn.GrowFromPoint(e, base.get_center()))
+            for t in text:
+                animations.append(mn.GrowFromPoint(t, base.get_center()))
 
+        self.play(mn.AnimationGroup(*animations))
+
+        for vert, edge, text in zip(branch_vertices, branch_edges, ellipses_groups):
             vv += vert
             ee += edge
             tt += text
-        self.play(*[mn.Create(v) for v in vv], *[mn.Create(e) for e in ee], *[mn.Create(t) for t in tt])
-        self.end_fragment()
+        # OLD TREE BRANCHES
+        #self.play(*[mn.Create(v) for v in vv], *[mn.Create(e) for e in ee], *[mn.Create(t) for t in tt])
+        #self.end_fragment()
 
         vert_no = START_NO
         group_labels = []
-        for i, base_vertex in enumerate(vertices[1:-1]):
-            if i % 2 == 1:
+        for i, base_vertex in enumerate(vertices):
+            if i % 2 == 0:
                 direction = 1
             else:
                 direction = -1
-            group_labels.append(mn.Tex(f"$F_{{x_{{{vert_no}}}}}$").move_to(base_vertex.get_center() + direction*mn.UP + direction*mn.UP*np.sin(3*np.pi/4)).scale(1).scale(0.75))
+            group_labels.append(mn.Tex(f"$F_{{x_{{{vert_no-1}}}}}$").move_to(base_vertex.get_center() + direction*mn.UP + direction*mn.UP*np.sin(3*np.pi/4)).scale(1).scale(0.75))
             vert_no += 1
-        self.play(*[mn.Write(text) for text in group_labels])
-        self.end_fragment()
 
         vert_labels = []
         vert_no = START_NO
-        for i, base_vertex in enumerate(vertices[1:-1]):
-            if i % 2 == 1:
+        for i, base_vertex in enumerate(vertices):
+            if i % 2 == 0:
                 direction = -1
             else:
                 direction = 1
-            vert_labels.append(mn.Tex(f"$x_{{{vert_no}}}$").move_to(base_vertex.get_center() + direction*0.4*mn.UP).scale(0.75))
+            vert_labels.append(mn.Tex(f"$x_{{{vert_no-1}}}$").move_to(base_vertex.get_center() + direction*0.4*mn.UP).scale(0.75))
             vert_no += 1
+
         self.play(*[mn.Write(text) for text in vert_labels])
         self.end_fragment()
 
+        self.play(*[mn.Write(text) for text in group_labels])
+        self.end_fragment()
+
+        # Automorphism of tree.
+        branch_group = mn.VGroup(vertices[-1*START_NO+1])
+        for vert in branch_vertices[-1*START_NO+1]:
+            branch_group.add(vert)
+        for edge in branch_edges[-1*START_NO+1]:
+            branch_group.add(edge)
+        branch_group.add(ellipses_groups[-1*START_NO+1])
+        branch_group.add(group_labels[-1*START_NO+1])
+
+        self.play(mn.Indicate(branch_group))
+        self.end_fragment()
+
+        rotate_group = mn.VGroup()
+        for vert in branch_vertices[-1*START_NO+1][1:]:
+            rotate_group.add(vert)
+        for edge in branch_edges[-1*START_NO+1][1:]:
+            rotate_group.add(edge)
+        rotate_group.add(ellipses_groups[-1*START_NO+1])
+
+        self.play(mn.Rotate(rotate_group, angle=np.pi, axis=np.array([0, 1, 0]), about_point=branch_vertices[-1*START_NO+1][0].get_center()))
+        self.end_fragment()
+
+        # Scale Tree
         tree_group = mn.VGroup()
 
         for v in vv:
@@ -256,6 +297,30 @@ class PropertyP(PresentationScene):
             tree_group.add(t)
 
         self.play(tree_group.animate.scale(0.5).shift(2*mn.UP))
+        self.end_fragment()
+
+        text_1 = r"The group $F_{x}$ is the permutation group obtained by restricting $G_{C}$ to $T_{x}$."
+        text_2 = r"The natural map \[\Phi : G_{C} \to \prod_{x \in C} F_{x}\] is an injective homomorphism."
+        text_3 = r"If it is an isomorphism for every finite and (bi)infinite path then $G$ satisfies Property-($P$)."
+
+        b_list = mn.BulletedList(text_1, text_2, text_3, height=2, width=10).shift(1.5*mn.DOWN)
+        for i, row in enumerate(b_list):
+            self.play(mn.Write(row))
+            self.end_fragment()
+            if i == 0:
+                self.play(mn.Indicate(end_group))
+                self.end_fragment()
+
+        new_line = mn.Line(start=vertices[0].get_center(), end=vertices[-1].get_center())
+        rect = mn.Rectangle(width=new_line.width, height=8)\
+                .next_to(new_line, mn.UP, buff=0)\
+                .set_style(fill_opacity=1, stroke_width=0, fill_color=mn.BLACK)
+
+        self.play(mn.Transform(tree_group, new_line))
+        self.add(rect)
+        fade_gp = mn.VGroup(new_line, rect)
+        self.play(fade_gp.animate.align_to(b_list, mn.DOWN))
+        self.play(mn.ShrinkToCenter(new_line))
         self.end_fragment()
             
 
