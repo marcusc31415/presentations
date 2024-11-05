@@ -322,5 +322,52 @@ class PropertyP(PresentationScene):
         self.play(fade_gp.animate.align_to(b_list, mn.DOWN))
         self.play(mn.ShrinkToCenter(new_line))
         self.end_fragment()
-            
 
+class LocalActionDiagrams(PresentationScene):
+    def construct(self):
+        # Go through definition of LAD with picture to highlight each part of it.
+        # 1-1 correspondence with conjugacy classes of (P)-closed groups.
+        # Properties of the groups are reflected in the LAD (e.g. discrete).
+        # Show the construction/reverse process. 
+
+        title = mn.Tex("Local Action Diagrams")
+        self.play(mn.Write(title))
+        self.end_fragment()
+
+
+        lad_dot = mn.Dot(point=mn.ORIGIN)
+
+        def rotate_point(point, angle):
+            return mn.RIGHT * (point[0]*np.cos(angle) - point[1]*np.sin(angle)) + mn.UP * (point[0]*np.sin(angle) + point[1]*np.cos(angle))
+
+        bez_point1 = 2*(mn.UP + 0.5*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 0.5*mn.LEFT)
+        blue_curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.BLUE)
+        red_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, np.pi/3), rotate_point(bez_point2, np.pi/3), mn.ORIGIN, color=mn.RED)
+        green_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, -np.pi/3), rotate_point(bez_point2, -np.pi/3), mn.ORIGIN, color=mn.GREEN)
+
+        vert_label = mn.MathTex(r"C_2").next_to(lad_dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        red_label = mn.MathTex(r"\{1, 2\}").move_to(mn.UP + 1.85*mn.LEFT).scale(0.75)
+        blue_label = mn.MathTex(r"\{3\}").move_to(2*mn.UP).scale(0.75)
+        green_label = mn.MathTex(r"\{4\}").move_to(mn.UP + 1.65*mn.RIGHT).scale(0.75)
+            
+        lad_1 = mn.VGroup(blue_curve, red_curve, green_curve, lad_dot, vert_label, red_label, blue_label, green_label)
+
+        self.play(mn.ReplacementTransform(title, lad_1))
+        self.end_fragment()
+
+        self.play(lad_1.animate.shift(1.5*mn.UP))
+        self.end_fragment()
+
+        item_1 = r"A connected graph $\Gamma$."
+        item_2 = r"For each arc $a$ a non-empty set $X_a$ (called the colour set of $a$) disjoint from each other colour set."
+        item_3 = r"For each vertex $v$ a group $G(v)$ (called the local action at $v$) such that each $X_a$ is an orbit of $G(o^{-1}(v))$."
+        lad_desc = mn.Tex(r"A Local Action Diagram $\Delta$ = $(\Gamma, (G(v)), X_{a})$ consists of:", height=2, width=10)
+
+        lad_list = mn.BulletedList(item_1, item_2, item_3, height=1.5, width=10)
+        lad_paragraph = mn.VGroup(lad_desc, lad_list)
+        lad_paragraph.arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=mn.MED_LARGE_BUFF).shift(1*mn.DOWN)
+        lad_list.shift(0.1*mn.UP + 0.5*mn.RIGHT)
+
+        self.play(mn.Create(lad_paragraph))
+        self.end_fragment()
