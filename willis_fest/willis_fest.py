@@ -359,15 +359,214 @@ class LocalActionDiagrams(PresentationScene):
         self.play(lad_1.animate.shift(1.5*mn.UP))
         self.end_fragment()
 
+        graph = mn.VGroup(blue_curve, red_curve, green_curve, lad_dot)
+        edge_labels = mn.VGroup(red_label, blue_label, green_label)
+
         item_1 = r"A connected graph $\Gamma$."
         item_2 = r"For each arc $a$ a non-empty set $X_a$ (called the colour set of $a$) disjoint from each other colour set."
         item_3 = r"For each vertex $v$ a group $G(v)$ (called the local action at $v$) such that each $X_a$ is an orbit of $G(o^{-1}(v))$."
-        lad_desc = mn.Tex(r"A Local Action Diagram $\Delta$ = $(\Gamma, (G(v)), X_{a})$ consists of:", height=2, width=10)
+        lad_desc = mn.Tex(r"A Local Action Diagram $\Delta$ = $(\Gamma, (G(v)), (X_{a}))$ consists of:", height=2, width=10)
 
         lad_list = mn.BulletedList(item_1, item_2, item_3, height=1.5, width=10)
         lad_paragraph = mn.VGroup(lad_desc, lad_list)
         lad_paragraph.arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=mn.MED_LARGE_BUFF).shift(1*mn.DOWN)
         lad_list.shift(0.1*mn.UP + 0.5*mn.RIGHT)
 
-        self.play(mn.Create(lad_paragraph))
+        self.play(mn.Write(lad_desc))
         self.end_fragment()
+
+        for row, feature in zip(lad_list, [graph, edge_labels, vert_label]):
+            self.play(mn.Write(row))
+            self.end_fragment()
+            self.play(mn.Indicate(feature))
+            self.end_fragment()
+
+        # Go through definition of LAD with picture to highlight each part of it.
+        # 1-1 correspondence with conjugacy classes of (P)-closed groups.
+        # Properties of the groups are reflected in the LAD (e.g. discrete).
+        # Show the construction/reverse process. 
+        
+        why_text = mn.Tex("Why?").scale(2)
+
+        self.play(mn.ReplacementTransform(mn.VGroup(lad_desc, lad_list), why_text))
+        self.end_fragment()
+
+        because_text = mn.Tex(r"They are in a one-to-one correspondence with conjugacy classes of \\ $(P)$-closed groups and properties of the group are \\ reflected in them.", font_size=38, should_center=True).shift(2*mn.DOWN)
+
+        self.play(mn.Write(because_text))
+        self.end_fragment()
+        
+        bot_left = np.array([because_text.get_left()[0] - mn.MED_SMALL_BUFF, because_text.get_bottom()[1], 0])
+        top_left = np.array([because_text.get_left()[0] - mn.MED_SMALL_BUFF, lad_1.get_top()[1], 0]) 
+        side_line = mn.Line(top_left, bot_left)
+        rect = mn.Rectangle(height=side_line.height, width=16)\
+                .next_to(side_line, mn.LEFT, buff=0)\
+                .set_style(fill_opacity=1, stroke_width=0, fill_color=mn.BLACK)
+        self.play(mn.GrowFromCenter(side_line))
+        self.add(rect)
+        fade_gp = mn.VGroup(side_line, rect)
+        self.play(fade_gp.animate.align_to(because_text, mn.RIGHT))
+        self.play(mn.ShrinkToCenter(side_line))
+        self.end_fragment()
+
+        # Show the construction/reverse process. 
+
+        for mob in self.mobjects:
+            self.remove(mob)
+
+        # NEW SCENE #
+
+
+        colours = {0: mn.RED, 1: mn.BLUE, 2: mn.GREEN}
+        back_colours = {str(mn.RED): 0, str(mn.BLUE): 1, str(mn.GREEN): 2}
+
+        line_groups = [mn.VGroup() for _ in range(0, 3)]
+        
+        dot_group = mn.VGroup()
+
+        full_dots = []
+        dot_points = []
+
+        dot = mn.Dot(point=mn.ORIGIN)
+        full_dots.append(dot)
+        dot_group.add(dot)
+        full_dots[0].z_index=1
+
+        full_lines = []
+        angles = []
+
+        temp_lines = []
+        temp_angles = []
+        angle = np.pi/6
+        for i in range(0, 3):
+            temp_lines.append(mn.Line(start=mn.ORIGIN, end=2.5*(mn.RIGHT*np.cos(angle + (i)*2*np.pi/3) + mn.UP*np.sin(angle + (i)*2*np.pi/3)), color=colours[i]))
+            temp_angles.append(angle + (i)*2*np.pi/3)
+            line_groups[i].add(temp_lines[i])
+        full_lines.append(temp_lines)
+        angles.append(temp_angles)
+
+        dot_prev = 0
+        dot_current = 1
+        dot_points.append(dot_prev)
+        dot_points.append(dot_current)
+
+        for radius in range(0, 4):
+            for i, dot in enumerate(full_dots[dot_prev:dot_current]):
+                for j, line in enumerate(full_lines[i+dot_prev]): # Each line attached to dot.
+                    new_lines = []
+                    new_angles = []
+                    full_dots.append(mn.Dot(point=line.end, z_index=1)) # Create a new dot at the end of the line.
+                    dot_group.add(full_dots[-1])
+                    #angle = np.pi-angles[i][j] # The angle the existing line goes out from the new dot.
+                    start_colour = back_colours[str(line.color)] # Starting index for the colours (colour of the existing line)
+                    direction_vec = line.start - line.end
+                    direction_vec = direction_vec / (1.5)
+                    angle = (2+radius+1)*np.pi/(3+radius+1)
+                    angle2 = 2*np.pi/(3+radius+1)
+                    direction_vec = mn.RIGHT * (direction_vec[0]*np.cos(angle) - direction_vec[1]*np.sin(angle)) + \
+                                    mn.UP * (direction_vec[0]*np.sin(angle) + direction_vec[1]*np.cos(angle))
+                    for it in range(0, 2):
+                        if it != 0:
+                            direction_vec = mn.RIGHT * (direction_vec[0]*np.cos(angle2) - direction_vec[1]*np.sin(angle2)) + \
+                                            mn.UP * (direction_vec[0]*np.sin(angle2) + direction_vec[1]*np.cos(angle2))
+                        new_lines.append(mn.Line(start=line.end, end=line.end + direction_vec, color=colours[(start_colour+it+1) % 3]))
+                        line_groups[(start_colour+it+1) % 3].add(new_lines[it])
+                    full_lines.append(new_lines)
+                    angles.append(new_angles)
+            dot_prev = dot_current
+            dot_current = len(full_dots)
+            dot_points.append(dot_current)
+
+
+        for i, _ in enumerate(dot_points[:-1]):
+            dot_current = dot_points[i]
+            dot_next = dot_points[i+1]
+            line_list = []
+            for lines in full_lines[dot_current:dot_next]:
+                line_list = line_list + lines
+            self.play(*[mn.Create(i) for i in full_dots[dot_current:dot_next]], rate_func=mn.rate_functions.linear, run_time=0.5)
+            self.play(*[mn.Create(i) for i in line_list], rate_func=mn.rate_functions.linear, run_time=0.75)
+
+        text_group = mn.VGroup()
+
+        for line_list in full_lines[dot_current:dot_next]:
+            for line in line_list:
+                dots = mn.Text("\u22ef")
+                line_dir = line.end - line.start
+                angle = np.arctan2(line_dir[1], line_dir[0])
+                dots.rotate(angle + np.pi)
+                buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+                dots.move_to((line.end + line.start)/2 + buffer)
+                text_group.add(dots)
+
+        self.play(*[mn.Write(text) for text in text_group], rate_func=mn.rate_functions.linear)
+        self.end_fragment()
+
+        lad_dot = mn.Dot(point=mn.ORIGIN)
+
+        def rotate_point(point, angle):
+            return mn.RIGHT * (point[0]*np.cos(angle) - point[1]*np.sin(angle)) + mn.UP * (point[0]*np.sin(angle) + point[1]*np.cos(angle))
+
+        bez_point1 = 2*(mn.UP + 0.5*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 0.5*mn.LEFT)
+        blue_curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.BLUE)
+        red_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, np.pi/3), rotate_point(bez_point2, np.pi/3), mn.ORIGIN, color=mn.RED)
+        green_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, -np.pi/3), rotate_point(bez_point2, -np.pi/3), mn.ORIGIN, color=mn.GREEN)
+
+        vert_label = mn.MathTex(r"1").next_to(lad_dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        red_label = mn.MathTex(r"\{1\}").move_to(mn.UP + 1.65*mn.LEFT).scale(0.75)
+        blue_label = mn.MathTex(r"\{2\}").move_to(2*mn.UP).scale(0.75)
+        green_label = mn.MathTex(r"\{3\}").move_to(mn.UP + 1.65*mn.RIGHT).scale(0.75)
+
+        lad_labels = mn.VGroup(vert_label, red_label, blue_label, green_label)
+        edge_labels = mn.VGroup(red_label, blue_label, green_label)
+
+        animations = [
+                mn.ReplacementTransform(line_groups[0], red_curve),
+                mn.ReplacementTransform(line_groups[1], blue_curve),
+                mn.ReplacementTransform(line_groups[2], green_curve),
+                mn.ReplacementTransform(dot_group, lad_dot),
+                mn.ReplacementTransform(text_group, lad_labels)
+                ]
+
+        self.play(mn.AnimationGroup(*animations), run_time=3)
+        self.end_fragment()
+
+        lad_edges = mn.VGroup(red_curve, blue_curve, green_curve)
+
+        l_point = 2*mn.LEFT
+        r_point = 2*mn.RIGHT
+        bez_point1 = mn.UP
+        bez_point2 = mn.DOWN
+        blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
+        red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
+        new_lad_edges = mn.VGroup(blue_curve, red_curve)
+        new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
+        new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
+
+        for label, dot in zip(new_lad_dot_labels, new_lad_dots):
+            label.next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+
+        new_lad_edge_labels = mn.VGroup(mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3, 4, 5\}"))
+
+        for i, (label, edge) in enumerate(zip(new_lad_edge_labels, new_lad_edges)):
+            if i == 0:
+                label.next_to(edge, mn.UP, 8*mn.SMALL_BUFF).scale(0.75)
+            else:
+                label.next_to(edge, mn.DOWN, 8*mn.SMALL_BUFF).scale(0.75)
+
+
+        animations = [
+                mn.ReplacementTransform(lad_edges, new_lad_edges),
+                mn.ReplacementTransform(lad_dot, new_lad_dots),
+                mn.ReplacementTransform(edge_labels, new_lad_edge_labels),
+                mn.ReplacementTransform(vert_label, new_lad_dot_labels)
+                ]
+        
+        self.play(mn.AnimationGroup(*animations))
+
+        tip = mn.Triangle(fill_color=mn.BLUE).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.25)
+        self.play(mn.Create(tip))
+        self.end_fragment()
+
+
