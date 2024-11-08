@@ -577,19 +577,28 @@ class LocalActionDiagrams(PresentationScene):
 
         tree_verts = mn.VGroup()
         tree_edges = mn.VGroup()
+        tree_labels = mn.VGroup()
         tree_dots = mn.VGroup()
 
         def angle_unit(angle):
             return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
 
-        def bez_edge(start, end, color, direction):
+        labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
+        def bez_edge(start, end, color, direction, label=0):
             l_point = start.get_center()
             r_point = start.get_center() + 1*mn.RIGHT
             bez_point1 = 0.25*direction + start.get_center() + 0.5*mn.RIGHT
             bez_point2 = -0.25*direction + start.get_center() + 0.5*mn.RIGHT
             curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
-            curve.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
-            return curve
+            label = labels[label].copy().move_to((2*start.get_center() + mn.RIGHT)/2).shift(0.325*direction).scale(0.35)
+            if end.get_center()[0] < start.get_center()[0]:
+                label = label.rotate(np.pi)
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            grp = mn.VGroup(curve, label, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
 
 
         tree_verts.add(mn.Dot(mn.ORIGIN, z_index=1))
@@ -600,26 +609,27 @@ class LocalActionDiagrams(PresentationScene):
         tree_verts.add(mn.Dot(tree_verts[5].get_center() + angle_unit(40), z_index=1), mn.Dot(tree_verts[6].get_center() + angle_unit(320), z_index=1))
 
 
-        tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.DOWN))  #0
-        tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.DOWN))  #1
-        tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.DOWN))   #2
-        tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.DOWN))   #3
-        tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP))     #4
-        tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP))     #5
-        tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP))    #6
-        tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP))    #7
-        tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.DOWN))   #8
-        tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.DOWN))   #9
-        tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.DOWN))  #10
-        tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.DOWN))  #11
-        tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP))    #12
-        tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP))     #13
-        tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP))    #14
-        tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP))     #15
-        tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.DOWN))  #16
-        tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.DOWN))   #17
-        tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.DOWN)) #18
-        tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.DOWN))  #19
+
+        tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.DOWN, 0))  #0
+        tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.DOWN, 1))  #1
+        tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.DOWN, 2))   #2
+        tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.DOWN, 2))   #3
+        tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, 3))     #4
+        tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, 4))     #5
+        tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, 0))    #6
+        tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, 0))    #7
+        tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.DOWN, 3))   #8
+        tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.DOWN, 4))   #9
+        tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.DOWN, 0))  #10
+        tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.DOWN, 0))  #11
+        tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, 1))    #12
+        tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, 2))     #13
+        tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, 1))    #14
+        tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, 2))     #15
+        tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.DOWN, 1))  #16
+        tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.DOWN, 2))   #17
+        tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.DOWN, 1)) #18
+        tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.DOWN, 2))  #19
 
         for start, end in zip(tree_verts[3:7], tree_verts[7:11]):
             line_dir = end.get_center() - start.get_center()
@@ -658,11 +668,25 @@ class LocalActionDiagrams(PresentationScene):
         self.play(*[mn.Create(tree_edges[i]) for i in range(12, 20)], *[mn.Create(tree_verts[i]) for i in range(7, 11)], *[mn.Write(d) for d in tree_dots])
         self.end_fragment()
 
+        # Coloured path
+        col_path_grp = mn.VGroup(tree_edges[0].copy(), tree_edges[4].copy(), tree_edges[12].copy())
+
+
+        self.play(col_path_grp.animate.set_color(mn.YELLOW))
+        self.end_fragment()
+
+        self.play(mn.Indicate(tree_verts[7]))
+        self.end_fragment()
+
+        self.play(mn.FadeOut(col_path_grp))
+        self.end_fragment()
+
         # Show aut
         self.play(mn.Indicate(tree_verts[0]), mn.Indicate(tree_edges[0]), mn.Indicate(tree_edges[1]))
         self.end_fragment()
         self.play(mn.Indicate(new_lad_dot_labels[0]))
         self.end_fragment()
+
 
         self.play(mn.Rotate(whole_tree, angle=-np.pi, about_point=mn.ORIGIN))
         self.end_fragment()
@@ -676,4 +700,60 @@ class LocalActionDiagrams(PresentationScene):
             # Show coloured paths.
             # Label the edges. 
             # Explain it is a Delta-tree.
+
+class TranslationAxes(PresentationScene):
+    def construct(self):
+        tex_t = mn.TexTemplate()
+        tex_t.add_to_preamble(r"\usepackage{amsmath}")
+
+        title = mn.Tex("Translation Axes")
+        self.play(mn.Write(title))
+        self.play(title.animate.shift(3*mn.UP))
+        text1 = r"There are three ways an automorphism can act: fix a vertex, fix an edge, and translate."
+        text2 = r"In a locally finite tree $G_F$ is compact for any finite set $F$."
+        text3 = r"This means to find the scale values of a group we need to identify all translations.\phantom{t} "
+        text4 = r"In a local action diagram we can do this by using"
+        
+
+        blist = mn.BulletedList(text1, text2, text3, text4, width=12, height=2).next_to(title, mn.DOWN, 0.5)
+        text5 = mn.Tex(r"Minimal Admissible Multi-coloured Circuits").next_to(blist, mn.DOWN, 1)
+        text6 = mn.Tex(r"MAMuCs?").next_to(blist, mn.DOWN, 1)
+        text7 = text5.copy()
+        for i, row in enumerate(blist):
+            if i != 3:
+                self.play(mn.Write(row))
+                self.end_fragment()
+            else:
+                self.play(mn.Write(row))
+                self.play(mn.Write(text5))
+                self.end_fragment()
+        
+        self.play(mn.ReplacementTransform(text5, text6))
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(text6, text7))
+        self.end_fragment()
+
+        whole_group = mn.Group(*[obj for obj in self.mobjects])
+        dist = title.get_center() - text7.get_center()
+        self.play(whole_group.animate.shift(dist))
+        self.end_fragment()
+
+        cc_text = mn.Tex("Multi-coloured Circuits").move_to(text7.get_center())
+        self.play(mn.ReplacementTransform(text7, cc_text))
+        self.end_fragment()
+
+        cc_intro = mn.Tex(r"\raggedright A multi-coloured circuit (of length $l$) is a triple $\mathcal{C} = ((a_i)_{i=0}^{l-1}, (C_{a_i}), (D_{\overline{a_i}}))$ such that:", width=11, height=2)
+
+        text1 = r"$t(a_i) = o(a_{i+1})$."
+        text2 = r"$C_{a_i} \subseteq X_{a_i}$ and $D_{\overline{a_i}} \subseteq X_{\overline{a_i}}$."
+        text3 = r"If $\left|D_{\overline{a_i}}\right| = 1$ then $a_{i+1} \not= \overline{a_i}$ and if $\left|C_{a_i}\right| = 1$ then $\overline{a_{i+1}} \not= a_i$."
+        blist = mn.BulletedList(text1, text2, text3, width=11, height=2).next_to(cc_intro, mn.DOWN, 0.5).shift(0.5*mn.RIGHT)
+
+        para_group = mn.VGroup(cc_intro, blist).next_to(cc_text, mn.DOWN, 1)
+
+        for row in [cc_intro, *blist]:
+            self.play(mn.GrowFromPoint(row, cc_text.get_center()))
+            self.end_fragment()
+
+        # Go over conditions for MAMuC. 
 
