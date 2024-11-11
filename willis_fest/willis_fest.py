@@ -1,6 +1,6 @@
 import manim as mn
 import numpy as np
-from manim_revealjs import PresentationScene, COMPLETE_LOOP
+from manim_revealjs import PresentationScene, COMPLETE_LOOP, LOOP
 
 
 mn.config.video_dir= "./videos"
@@ -738,7 +738,7 @@ class TranslationAxes(PresentationScene):
         self.play(whole_group.animate.shift(dist))
         self.end_fragment()
 
-        cc_text = mn.Tex("Multi-coloured Circuits").move_to(text7.get_center())
+        cc_text = mn.Tex("Multi-coloured",  " Circuits").move_to(text7.get_center())
         self.play(mn.ReplacementTransform(text7, cc_text))
         self.end_fragment()
 
@@ -754,6 +754,96 @@ class TranslationAxes(PresentationScene):
         for row in [cc_intro, *blist]:
             self.play(mn.GrowFromPoint(row, cc_text.get_center()))
             self.end_fragment()
+        
+        # Demonstration LAD 1
+        l_point = 2*mn.LEFT
+        r_point = 2*mn.RIGHT
+        bez_point1 = mn.UP
+        bez_point2 = mn.DOWN
+        blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
+        red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
+        new_lad_edges = mn.VGroup(blue_curve, red_curve)
+        new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
+        new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
 
-        # Go over conditions for MAMuC. 
+        for label, dot in zip(new_lad_dot_labels, new_lad_dots):
+            label.next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
 
+        new_lad_edge_labels = mn.VGroup(mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3, 4, 5\}"))
+
+        for i, (label, edge) in enumerate(zip(new_lad_edge_labels, new_lad_edges)):
+            if i == 0:
+                label.next_to(edge, mn.UP, 8*mn.SMALL_BUFF).scale(0.75)
+            else:
+                label.next_to(edge, mn.DOWN, 8*mn.SMALL_BUFF).scale(0.75)
+
+        tip = mn.Triangle(color=mn.BLUE, fill_color=mn.BLUE, fill_opacity=1).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.125)
+        tip2 = mn.Triangle(color=mn.RED, fill_color=mn.RED, fill_opacity=1).rotate(1*np.pi/2).move_to(new_lad_edges[1].point_from_proportion(0.5)).scale(0.125)
+        new_lad_edges.add(tip)
+        new_lad_edges.add(tip2)
+
+
+        self.play(mn.Unwrite(cc_intro, run_time=0.5), blist.animate.shift(1.5*mn.UP))
+
+        lad = mn.VGroup(new_lad_edges, new_lad_dots, new_lad_dot_labels, new_lad_edge_labels).next_to(blist, mn.DOWN, 0.25)
+        self.play(mn.GrowFromCenter(lad))
+        self.end_fragment()
+
+        self.play(mn.Indicate(blist[0]))
+        self.end_fragment()
+
+        edge_1 = new_lad_edges[0].copy().set_color(mn.YELLOW)
+        edge_2 = new_lad_edges[1].copy().set_color(mn.YELLOW)
+        v1 = new_lad_dots[1].copy().set_color(mn.YELLOW)
+        v2 = new_lad_dots[0].copy().set_color(mn.YELLOW)
+
+        lin_func = mn.rate_functions.linear
+
+        self.play(mn.ShowPassingFlash(edge_1, rate_func=lin_func, time_width=0.2))
+        self.play(mn.ShowPassingFlash(v1, rate_func=lin_func, time_width=1, run_time=0.25))
+        self.play(mn.ShowPassingFlash(edge_2, rate_func=lin_func, time_width=0.2))
+        self.play(mn.ShowPassingFlash(v2, rate_func=lin_func, time_width=1, run_time=0.25))
+
+        self.end_fragment(fragment_type=LOOP)
+
+        self.play(mn.Indicate(blist[1]))
+        self.end_fragment()
+        self.play(mn.Indicate(cc_text[0]))
+        self.end_fragment()
+
+
+        lad_dot = mn.Dot(point=mn.ORIGIN)
+
+        def rotate_point(point, angle):
+            return mn.RIGHT * (point[0]*np.cos(angle) - point[1]*np.sin(angle)) + mn.UP * (point[0]*np.sin(angle) + point[1]*np.cos(angle))
+
+        bez_point1 = 2*(mn.UP + 0.5*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 0.5*mn.LEFT)
+        blue_curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.BLUE)
+        red_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, np.pi/3), rotate_point(bez_point2, np.pi/3), mn.ORIGIN, color=mn.RED)
+        green_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, -np.pi/3), rotate_point(bez_point2, -np.pi/3), mn.ORIGIN, color=mn.GREEN)
+
+        vert_label = mn.MathTex(r"1").next_to(lad_dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        red_label = mn.MathTex(r"\{1\}").move_to(mn.UP + 1.65*mn.LEFT).scale(0.75)
+        blue_label = mn.MathTex(r"\{2\}").move_to(2*mn.UP).scale(0.75)
+        green_label = mn.MathTex(r"\{3\}").move_to(mn.UP + 1.65*mn.RIGHT).scale(0.75)
+
+        lad_labels = mn.VGroup(vert_label, red_label, blue_label, green_label)
+        edge_labels = mn.VGroup(red_label, blue_label, green_label)
+
+        lad_edges = mn.VGroup(blue_curve, green_curve, red_curve)
+
+        lad = mn.VGroup(lad_labels, edge_labels, lad_dot, blue_curve, green_curve, red_curve).next_to(blist, mn.DOWN, 0.25)
+        
+        animations = [
+                mn.ReplacementTransform(new_lad_edges, lad_edges),
+                mn.ReplacementTransform(new_lad_dots, lad_dot),
+                mn.ReplacementTransform(new_lad_edge_labels, edge_labels),
+                mn.ReplacementTransform(new_lad_dot_labels, vert_label)
+                ]
+
+        
+        self.play(mn.Indicate(blist[2]))
+        self.end_fragment()
+        self.play(mn.AnimationGroup(*animations))
+        self.end_fragment()
