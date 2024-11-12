@@ -833,6 +833,7 @@ class TranslationAxes(PresentationScene):
 
         lad_edges = mn.VGroup(blue_curve, green_curve, red_curve)
 
+        old_lad = lad.copy()
         lad = mn.VGroup(lad_labels, edge_labels, lad_dot, blue_curve, green_curve, red_curve).next_to(blist, mn.DOWN, 0.25)
         
         animations = [
@@ -847,3 +848,102 @@ class TranslationAxes(PresentationScene):
         self.end_fragment()
         self.play(mn.AnimationGroup(*animations))
         self.end_fragment()
+
+        admissible_text = mn.Tex("Admissible Multi-coloured Circuits").move_to(cc_text.get_center())
+
+        remove_grp = mn.VGroup(lad, blist, cc_intro)
+        self.play(remove_grp.animate.shift(8*mn.DOWN))
+        self.end_fragment()
+
+        self.remove(remove_grp)
+        c_cover = mn.Tex("Circuit Covers").move_to(cc_text.get_center())
+        self.play(mn.ReplacementTransform(cc_text, c_cover))
+        self.end_fragment()
+        self.play(mn.GrowFromCenter(old_lad))
+        self.end_fragment()
+
+        labels = [mn.Tex(f"{i}") for i in range(1, 6)]
+
+        def bez_edge(start, end, color, direction, label=0):
+            l_point = start.get_center()
+            r_point = end.get_center() 
+            bez_point1 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()
+            bez_point2 = -0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
+            label = labels[label].copy().move_to((start.get_center() + end.get_center())/2).shift(0.5*direction).scale(0.75)
+            if end.get_center()[0] < start.get_center()[0]:
+                label = label.rotate(np.pi)
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            grp = mn.VGroup(curve, label, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
+
+
+        verts = []
+        edges = []
+
+        start = cc_text.get_center() + 2*mn.DOWN + 9*mn.LEFT
+
+        for i in range(0, 19):
+            pt = start + 2*i*mn.RIGHT
+            verts.append(mn.Dot(pt, z_index=1))
+        
+        i = 0
+        for v1, v2 in zip(verts[:-1], verts[1:]):
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.DOWN, 0))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, 2))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, 1))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.DOWN, 3))
+            i += 1
+
+        self.play(*[mn.Create(v) for v in verts], *[mn.GrowFromCenter(e) for e in edges])
+        self.end_fragment()
+
+        remove_grp = mn.VGroup(*verts, *edges, old_lad)
+
+        self.play(mn.FadeOut(remove_grp, shift=mn.DOWN), mn.ReplacementTransform(c_cover, admissible_text))
+
+        ad_intro = mn.Tex(r"A coloured circuit is admissible if for each $i \in \{0, 1, \dots, l-1\}$", font_size=40).next_to(admissible_text, mn.DOWN, 1)
+        text1 = r"If $X_{a_{i}} \not= X_{\overline{a_{i-1}}}$ then $D_{\overline{a_{i-1}}} \times C_{a_{i}}$ is an orbit of the action of $G(o(a_{i}))$ on $X_{\overline{a_{i-1}}} \times X_{a_{i}}$"
+        text2 = r"If $X_{a_{i}} = X_{\overline{a_{i-1}}}$ then $D_{\overline{a_{i-1}}} \times C_{a_{i}} \backslash \{(x, x) : x \in X_{a_{i}}\}$ is an orbit of the action of $G(o(a_{i}))$ on $X_{\overline{a_{i-1}}} \times X_{a_{i}}$."
+
+        blist = mn.BulletedList(text1, text2, width=ad_intro.get_width()-1, height=2).next_to(ad_intro, mn.DOWN, 0.5).shift(0.5*mn.RIGHT)
+
+        self.play(mn.Write(ad_intro))
+        self.end_fragment()
+        self.play(mn.Write(blist))
+        self.end_fragment()
+        self.play(mn.ShrinkToCenter(mn.VGroup(ad_intro, blist)))
+        self.end_fragment()
+
+        self.play(mn.FadeIn(old_lad), *[mn.FadeIn(v, shift=mn.UP) for v in verts], *[mn.FadeIn(e, shift=mn.UP) for e in edges])
+        self.wait(1)
+        self.end_fragment()
+
+        # v[4]
+        # e[8]
+        # e[5]
+
+        right_edges = []
+        for i, e in enumerate(edges):
+            if (e[0].get_start() == verts[10].get_center()).all():
+                right_edges.append(i)
+
+
+        self.play(mn.Indicate(mn.VGroup(verts[4], edges[8], edges[5])))
+        self.end_fragment()
+
+        whole_tree = mn.VGroup(*edges, *verts)
+        self.play(whole_tree.animate.shift(2*6*mn.LEFT), run_time=2.5)
+        self.end_fragment()
+        
+        #e[19]
+        self.play(mn.Indicate(mn.VGroup(verts[10], edges[20], edges[17])))
+        self.end_fragment()
+
+        # LOOP EXAMPLE FOR MINIMAL
+
