@@ -867,8 +867,12 @@ class TranslationAxes(PresentationScene):
         def bez_edge(start, end, color, direction, label=0):
             l_point = start.get_center()
             r_point = end.get_center() 
-            bez_point1 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()
-            bez_point2 = -0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()
+            if direction[1] == mn.UP[1]:
+                bez_point1 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()# + 0.5*mn.LEFT
+                bez_point2 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()# + 0.5*mn.RIGHT
+            elif direction[1] == mn.DOWN[1]:
+                bez_point1 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()# + 0.5*mn.RIGHT
+                bez_point2 = 0.25*direction + 0.5*start.get_center() + 0.5*end.get_center()# + 0.5*mn.LEFT
             curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
             label = labels[label].copy().move_to((start.get_center() + end.get_center())/2).shift(0.5*direction).scale(0.75)
             if end.get_center()[0] < start.get_center()[0]:
@@ -921,7 +925,6 @@ class TranslationAxes(PresentationScene):
         self.end_fragment()
 
         self.play(mn.FadeIn(old_lad), *[mn.FadeIn(v, shift=mn.UP) for v in verts], *[mn.FadeIn(e, shift=mn.UP) for e in edges])
-        self.wait(1)
         self.end_fragment()
 
         # v[4]
@@ -946,4 +949,30 @@ class TranslationAxes(PresentationScene):
         self.end_fragment()
 
         # LOOP EXAMPLE FOR MINIMAL
+        min_text = mn.Tex("Minimal Admissible Multi-coloured Circuits").move_to(admissible_text.get_center())
+        self.play(mn.ReplacementTransform(admissible_text, min_text), mn.FadeOut(old_lad), *[mn.FadeOut(v, shift=mn.UP) for v in verts], *[mn.FadeOut(e, shift=mn.UP) for e in edges])
+        self.end_fragment()
 
+        verts = [mn.Dot(mn.LEFT + mn.DOWN), mn.Dot(mn.LEFT + mn.UP), mn.Dot(mn.RIGHT + mn.UP), mn.Dot(mn.RIGHT + mn.DOWN)]
+        edges = []
+
+        def bez_edge(start, end, color, direction, label=0):
+            l_point = start.get_center()
+            r_point = end.get_center()
+            bez_point1 = 0.25*direction + 0.25*mn.RIGHT + l_point
+            bez_point2 = 0.25*direction + 0.25*mn.LEFT + r_point # Maybe? 
+
+            # scale_points
+
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
+            label = labels[label].copy().move_to((start.get_center() + end.get_center())/2).shift(0.5*direction).scale(0.75)
+            if end.get_center()[0] < start.get_center()[0]:
+                label = label.rotate(np.pi)
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            grp = mn.VGroup(curve, label, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
+
+        self.play(mn.Create(bez_edge(mn.Dot(mn.LEFT), mn.Dot(mn.RIGHT), mn.RED, mn.UP)))
