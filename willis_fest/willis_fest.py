@@ -953,26 +953,308 @@ class TranslationAxes(PresentationScene):
         self.play(mn.ReplacementTransform(admissible_text, min_text), mn.FadeOut(old_lad), *[mn.FadeOut(v, shift=mn.UP) for v in verts], *[mn.FadeOut(e, shift=mn.UP) for e in edges])
         self.end_fragment()
 
-        verts = [mn.Dot(mn.LEFT + mn.DOWN), mn.Dot(mn.LEFT + mn.UP), mn.Dot(mn.RIGHT + mn.UP), mn.Dot(mn.RIGHT + mn.DOWN)]
+        verts = [mn.Dot(mn.LEFT + mn.DOWN, z_index=1), mn.Dot(mn.LEFT + mn.UP, z_index=1), mn.Dot(mn.RIGHT + mn.UP, z_index=1), mn.Dot(mn.RIGHT + mn.DOWN, z_index=1)]
         edges = []
 
-        def bez_edge(start, end, color, direction, label=0):
+        def bez_edge(start, end, color, direction, label=None):
             l_point = start.get_center()
             r_point = end.get_center()
-            bez_point1 = 0.25*direction + 0.25*mn.RIGHT + l_point
-            bez_point2 = 0.25*direction + 0.25*mn.LEFT + r_point # Maybe? 
-
-            # scale_points
-
-            curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
-            label = labels[label].copy().move_to((start.get_center() + end.get_center())/2).shift(0.5*direction).scale(0.75)
+            scale = np.sqrt((r_point[1]-l_point[1])**2 + (r_point[0]-l_point[0])**2)
+            l_point = start.get_center()
+            r_point = scale*mn.RIGHT + start.get_center()
+            bez_point1 = scale*(0.25*direction + 0.25*mn.RIGHT) + l_point
+            bez_point2 = scale*(0.25*direction + 0.25*mn.LEFT) + r_point # Maybe? 
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point2, r_point, color=color)
+            if label is not None:
+                label = labels[label].copy().move_to((start.get_center() + end.get_center())/2).shift(0.5*direction).scale(0.75)
             if end.get_center()[0] < start.get_center()[0]:
-                label = label.rotate(np.pi)
+                if label is not None:
+                    label = label.rotate(np.pi)
                 tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
             else:
                 tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
-            grp = mn.VGroup(curve, label, tip)
+            if label is not None:
+                grp = mn.VGroup(curve, label, tip)
+            else:
+                grp = mn.VGroup(curve, tip)
             grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
             return grp
 
-        self.play(mn.Create(bez_edge(mn.Dot(mn.LEFT), mn.Dot(mn.RIGHT), mn.RED, mn.UP)))
+        for i, j in zip(range(0, 4), range(1, 5)):
+            v1 = verts[(i % 4)]
+            v2 = verts[(j % 4)]
+            edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP))
+            edges.append(bez_edge(v2, v1, mn.RED, mn.UP))
+
+
+        new_lad = mn.VGroup(*[v for v in verts], *[e for e in edges])
+        self.play(mn.Create(new_lad))
+        self.end_fragment()
+
+        flash = [edges[0].copy().set_color(mn.YELLOW), edges[2].copy().set_color(mn.YELLOW), edges[4].copy().set_color(mn.YELLOW), edges[6].copy().set_color(mn.YELLOW)]
+
+        for i, segment in enumerate(flash):
+            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+
+        self.end_fragment()
+
+        for i, segment in enumerate(flash + flash):
+            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+
+        self.end_fragment()
+
+        for i, segment in enumerate(flash[2:] + flash[:2]):
+            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+
+        self.end_fragment()
+
+        flash = [edges[1].copy().set_color(mn.YELLOW), edges[7].copy().set_color(mn.YELLOW), edges[5].copy().set_color(mn.YELLOW), edges[3].copy().set_color(mn.YELLOW)]
+
+        for i, segment in enumerate(flash):
+            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+
+        self.end_fragment()
+
+        remove_grp = mn.VGroup(new_lad, min_text)
+
+        self.play(mn.ShrinkToCenter(remove_grp))
+        self.end_fragment()
+
+def createParagraph(title, text, paragraph_width_in_cm, font_size=48):  
+    template = mn.TexTemplate()
+    template.add_to_preamble(r"\usepackage{ragged2e}")  
+    template.add_to_preamble(r"\setlength\parindent{0pt}")  
+    paragraph = mn.VGroup()  
+    paragraph_title = mn.Tex(r"\textbf{" + title + r"}",  font_size=25,  color=mn.BLUE,  tex_template=template)  
+    paragraph_text = mn.Tex(r"\parbox{" + str(paragraph_width_in_cm) + r"cm}{\noindent{}\justifying{" + text + "}}",  font_size=font_size,  tex_template=template)  
+    paragraph = paragraph.add(paragraph_title, paragraph_text)  
+    paragraph = paragraph.arrange(mn.DOWN, aligned_edge=mn.LEFT)  
+    return paragraph_title, paragraph_text, paragraph
+
+
+class ScaleSection(PresentationScene):
+    def construct(self):
+        scale_text = mn.Tex("Scale Values of (P)-closed Groups")
+
+        tex_template = mn.TexTemplate()
+        tex_template.add_to_preamble(r"\usepackage{ragged2e}")
+
+        self.play(mn.Write(scale_text))
+        self.end_fragment()
+
+        scale_para = mn.Tex(r"If $\mathcal{C} = ((a_i), (C_{a_i}), (D_{\overline{a_i}}))$ is a minimal admissible \\ coloured circuit of length $l$ and $g$ is a translation of length $L$ \\ along a corresponding translation axis then}", font_size=48).shift(3*mn.UP)
+
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_i\right|\right)^{L/l}")
+
+        _, scale_para, _ = createParagraph("blah", r"If $\mathcal{C} = ((a_i), (C_{a_i}), (D_{\overline{a_i}}))$ is a minimal admissible coloured circuit of length $l$ and $g$ is a translation of length $L$ along a corresponding translation axis then}", 8, font_size=48)
+        scale_para = scale_para.shift(2.75*mn.UP)
+
+        self.play(mn.ReplacementTransform(scale_text, scale_para))
+        self.end_fragment()
+        self.play(mn.Write(scale_value))
+        self.end_fragment()
+
+        self.play(mn.Wiggle(scale_value, rate_func=mn.rate_functions.linear), run_time=0.5)
+        self.end_fragment()
+
+        current_grp = mn.VGroup(scale_para, scale_value)
+        self.play(current_grp.animate.shift(2.5*mn.UP))
+        self.end_fragment()
+
+        def bez_edge(start, end, color, direction, label=None):
+            l_point = start.get_center()
+            r_point = end.get_center()
+            scale = np.sqrt((r_point[1]-l_point[1])**2 + (r_point[0]-l_point[0])**2)
+            l_point = start.get_center()
+            r_point = scale*mn.RIGHT + start.get_center()
+            bez_point1 = scale*(0.25*direction + 0.25*mn.RIGHT) + l_point
+            bez_point2 = scale*(0.25*direction + 0.25*mn.LEFT) + r_point # Maybe? 
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point2, r_point, color=color)
+            if label is not None:
+                label = labels[label].copy().move_to((l_point + r_point)/2).shift(0.75*direction).scale(0.75)
+            if end.get_center()[0] < start.get_center()[0]:
+                if label is not None:
+                    label = label.rotate(np.pi, about_point=label.get_center())
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            if label is not None:
+                grp = mn.VGroup(curve, label, tip)
+            else:
+                grp = mn.VGroup(curve, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
+
+
+        labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
+
+        verts = []
+        edges = []
+
+        start = scale_value.get_center() + 2*mn.DOWN + 9*mn.LEFT
+
+        for i in range(0, 19):
+            pt = start + 2*i*mn.RIGHT
+            verts.append(mn.Dot(pt, z_index=1))
+        
+        i = 0
+        for v1, v2 in zip(verts[:-1], verts[1:]):
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.DOWN, 0))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.DOWN, 2))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.DOWN, 1))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.DOWN, 3))
+            i += 1
+
+        self.play(*[mn.Create(v) for v in verts], *[mn.GrowFromCenter(e) for e in edges])
+        self.end_fragment()
+
+        blue_edges = [e for e in edges if (e[0].get_color() == mn.BLUE)]
+
+        self.play(*[mn.Indicate(e, scale_factor=1.05) for e in blue_edges])
+        self.end_fragment()
+    
+        tree = mn.VGroup(*edges, *verts)
+
+        #e_c = edges[8].copy()
+        #e_d = edges[7].copy()
+
+        buff_edges = mn.VGroup(edges[8], edges[7])
+        buff_edges.save_state()
+
+        self.play(edges[8].animate.set_color(mn.YELLOW))
+        self.end_fragment()
+        self.play(edges[7].animate.set_color(mn.GREEN))
+        self.end_fragment()
+        self.play(mn.Restore(buff_edges))
+        self.end_fragment()
+
+        bot_left = np.array([0, scale_value.get_top()[1] + mn.MED_SMALL_BUFF, 0])
+        bot_right = np.array([0, scale_value.get_top()[1] + mn.MED_SMALL_BUFF, 0]) 
+        side_line = mn.Line(10*mn.LEFT + bot_left, 10*mn.RIGHT + bot_right)
+        rect = mn.Rectangle(height = 16, width=side_line.width, z_index=2)\
+                .next_to(side_line, mn.UP, buff=0)\
+                .set_style(fill_opacity=1, stroke_width=0, fill_color=mn.BLACK)
+        self.play(mn.GrowFromCenter(side_line))
+        self.add(rect)
+        fade_gp = mn.VGroup(side_line, rect)
+        self.play(fade_gp.animate.align_to(tree, mn.DOWN))
+        self.play(mn.ShrinkToCenter(side_line))
+        self.end_fragment()
+
+        self.remove(*[obj for obj in self.mobjects])
+
+        left_verts = [mn.Dot(i*mn.LEFT, z_index=1) for i in range(0, 10)]
+
+        left_edges = []
+
+        for v1, v2, in zip(left_verts[:-1], left_verts[1:]):
+            left_edges.append(mn.Line(v1.get_center(), v2.get_center()))
+
+        base_tree_verts = mn.VGroup(*left_verts)
+        base_tree_edges = mn.VGroup(*left_edges)
+
+        def create_branch(base, rotation=-1*np.pi/3, copy_branch=None, test=None):
+            if copy_branch is None:
+                base_v = base_tree_verts
+                base_e = base_tree_edges
+            else:
+                base_v = base_tree_verts
+                base_e = base_tree_edges
+                #base_v = copy_branch[0]
+                #base_e = copy_branch[1]
+            if test is None:
+                fb_v = base_v.copy().shift(base).rotate(rotation, about_point=base)
+                fb_e = base_e.copy().shift(base).rotate(rotation, about_point=base)
+            else:
+                fb_v = base_v.copy().shift(base)
+                fb_e = base_e.copy().shift(base)
+            return [fb_v, fb_e, base]
+
+        branches = []
+
+        branches.append(create_branch(3*mn.LEFT))
+        branches.append(create_branch(6*mn.LEFT))
+        branches.append(create_branch(9*mn.LEFT))
+        branches.append(create_branch(branches[0][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
+        branches.append(create_branch(branches[1][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
+        branches.append(create_branch(branches[2][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
+
+        half_tree = mn.VGroup(*left_verts, *left_edges)
+        for b in branches:
+            half_tree.add(*b[0], *b[1])
+
+        tree_two = half_tree.copy() #[8] is last vertex. 
+        tree_two.shift(9*mn.RIGHT)
+
+        tree_three = tree_two.copy().shift(9*mn.RIGHT)
+        whole_tree = mn.VGroup(half_tree, tree_two, tree_three).shift(mn.UP)
+
+        self.play(mn.FadeIn(whole_tree, shift=mn.UP))
+        self.end_fragment()
+
+        self.play(whole_tree.animate.shift(6*mn.LEFT))
+        self.end_fragment()
+        self.play(whole_tree.animate.shift(-6*mn.LEFT))
+        self.end_fragment()
+
+        old_vert_labels = []
+        old_vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$gx_{{{0}}}$").move_to(2*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^2x_{{{0}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^3x_{{{0}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^{-1}x_{{{0}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^{-2}x_{{{0}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+
+        vert_labels = []
+        vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{1}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{2}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{3}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{-1}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{-2}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+
+        self.play(*[mn.Write(v) for v in old_vert_labels])
+        self.end_fragment()
+
+        self.play(*[mn.ReplacementTransform(i, j) for i, j in zip(old_vert_labels[1:], vert_labels[1:])])
+        self.end_fragment()
+
+        _, u_plus_para, _ = createParagraph("blah", r"One application of the tidying procedure gives us the subgroup", 8, font_size=40)
+        u_plus_para = u_plus_para.shift(0.5*mn.DOWN)
+        u_text = mn.MathTex(r"U = G_{x_0} \cap gG_{x_0}g^{-1} = G_{x_0} \cap G_{gx_0} = G_{x_0, x_1}").shift(1.75*mn.DOWN)
+        _, u_plus_after, _ = createParagraph("blah", r"We can show that $U$ is tidy for $G_{x_0}$ and that", 8, font_size=40)
+        u_plus_after = u_plus_after.shift(1.25*mn.DOWN)
+        u_plus_text = mn.MathTex(r"U_+ = \bigcap_{i=0}^{\infty}g^iG_{x_0}g^{-i} = G_{x_0, x_1, x_2, \dots}").shift(2.75*mn.DOWN)
+
+        self.play(mn.Write(u_plus_para))
+        self.play(mn.Write(u_text))
+        grp = mn.VGroup(u_plus_para, u_text)
+        self.end_fragment()
+
+        self.play(mn.LaggedStart(mn.AnimationGroup(grp.animate.shift(1.25*mn.UP), mn.FadeOut(u_plus_para, shift=1.25*mn.UP)), mn.Write(u_plus_after), lag_ratio=0.425))
+        self.play(mn.Write(u_plus_text))
+        self.end_fragment()
+
+        indicate_ray = mn.VGroup(half_tree[0], tree_two[0:19], tree_three[0:19])
+        indicate_ray_two = mn.VGroup(tree_two[0:7] + tree_two[10:16], tree_three[0:19])
+
+        self.play(indicate_ray.animate.set_color(mn.YELLOW))
+        self.end_fragment()
+        scale_text = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : G_{x_0, x_1, x_2, \dots}\right|").move_to(u_plus_after.get_center())
+        text_grp = mn.VGroup(u_text, u_plus_after, u_plus_text)
+        self.play(mn.LaggedStart(mn.FadeOut(text_grp, shift=mn.RIGHT), mn.Write(scale_text), lag_ratio=0.3))
+        self.end_fragment()
+        self.play(indicate_ray_two.animate.set_color(mn.GREEN))
+        self.end_fragment()
+
+        nt = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : \left(G_{x_1, x_2, x_3, \dots}\right)_{x_0} \right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
+        os = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} \cdot x_0\right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
+        #nt.next_to(scale_text[1], direction=mn.LEFT)
+
+        #self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt, shift=mn.UP))
+        self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt[1], shift=mn.UP))
+        self.end_fragment()
+        self.play(mn.FadeOut(nt[1], shift=mn.UP), mn.FadeIn(os[1], shift=mn.UP))
+        self.end_fragment()
