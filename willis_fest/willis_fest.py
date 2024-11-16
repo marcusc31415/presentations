@@ -1155,6 +1155,7 @@ class ScaleSection(PresentationScene):
         base_tree_verts = mn.VGroup(*left_verts)
         base_tree_edges = mn.VGroup(*left_edges)
 
+
         def create_branch(base, rotation=-1*np.pi/3, copy_branch=None, test=None):
             if copy_branch is None:
                 base_v = base_tree_verts
@@ -1174,12 +1175,13 @@ class ScaleSection(PresentationScene):
 
         branches = []
 
-        branches.append(create_branch(3*mn.LEFT))
-        branches.append(create_branch(6*mn.LEFT))
-        branches.append(create_branch(9*mn.LEFT))
-        branches.append(create_branch(branches[0][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
-        branches.append(create_branch(branches[1][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
-        branches.append(create_branch(branches[2][0][3].get_center(), rotation=-np.pi/5 -np.pi/3, copy_branch=branches[0]))
+        branches.append(create_branch(3*mn.LEFT)) # 18
+        branches.append(create_branch(6*mn.LEFT)) # 36
+        branches.append(create_branch(9*mn.LEFT)) # 54
+        branches.append(create_branch(branches[0][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 72
+        branches.append(create_branch(branches[1][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 90
+        branches.append(create_branch(branches[2][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 108
+
 
         half_tree = mn.VGroup(*left_verts, *left_edges)
         for b in branches:
@@ -1214,6 +1216,7 @@ class ScaleSection(PresentationScene):
         vert_labels.append(mn.Tex(f"$x_{{{3}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
         vert_labels.append(mn.Tex(f"$x_{{{-1}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
         vert_labels.append(mn.Tex(f"$x_{{{-2}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+
 
         self.play(*[mn.Write(v) for v in old_vert_labels])
         self.end_fragment()
@@ -1250,11 +1253,45 @@ class ScaleSection(PresentationScene):
         self.end_fragment()
 
         nt = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : \left(G_{x_1, x_2, x_3, \dots}\right)_{x_0} \right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
-        os = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} \cdot x_0\right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
+        os = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} \cdot x_0\right|", r"= 2", r"= 2 \times 1 \times 1").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
         #nt.next_to(scale_text[1], direction=mn.LEFT)
 
         #self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt, shift=mn.UP))
         self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt[1], shift=mn.UP))
         self.end_fragment()
         self.play(mn.FadeOut(nt[1], shift=mn.UP), mn.FadeIn(os[1], shift=mn.UP))
+        self.end_fragment()
+        self.play(mn.Indicate(os[1]))
+        self.end_fragment()
+
+        self.play(mn.Indicate(half_tree[0], color=mn.RED), mn.Indicate(tree_two[9], color=mn.RED), mn.Indicate(old_vert_labels[0], color=mn.RED))
+        self.end_fragment()
+
+        swap_one = mn.VGroup(half_tree, tree_two[7:10], tree_two[16:19], tree_two[54:72], tree_two[108:])
+        swap_two = mn.VGroup(tree_two[54-18:72-18], tree_two[90:108])
+
+        swap_new = swap_one.copy().rotate(angle=-np.pi/3, about_point=3*mn.RIGHT + mn.UP).set_color(mn.WHITE)
+
+        self.add(swap_new)
+        swap_two.set_opacity(0)
+
+
+        self.play(mn.Rotate(swap_one, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
+                  mn.Rotate(swap_new, angle=np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
+                  *[mn.Rotate(vl, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP) for vl in [old_vert_labels[0], vert_labels[4], vert_labels[5]]])
+        self.end_fragment()
+
+
+        self.play(mn.FadeIn(os[2], shift=mn.UP))
+        self.end_fragment()
+        self.play(mn.FadeIn(os[3], shift=mn.UP))
+        self.end_fragment()
+
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_i\right|\right)^{L/l}").move_to(os.get_center())
+        
+        self.play(mn.FadeOut(os, shift=mn.UP), mn.FadeOut(scale_text[0], shift=mn.UP), mn.FadeIn(scale_value, shift=mn.UP))
+        self.end_fragment()
+
+        screen_grp = mn.Group(half_tree, swap_new, tree_two-swap_two, tree_three, scale_value, *vert_labels[1:], old_vert_labels[0])
+        self.play(mn.FadeOut(screen_grp, shift=mn.UP))
         self.end_fragment()
