@@ -62,6 +62,8 @@ class ScaleSection(PresentationScene):
         self.end_fragment()
 
 
+
+
         rect_1 = mn.Rectangle(height=1, width=2, fill_color=mn.GREY, fill_opacity=1)
         rect_1.move_to(mn.DOWN)
         brace_right = mn.BraceLabel(rect_1, "U_+", brace_direction=mn.RIGHT)
@@ -140,6 +142,11 @@ class ScaleSection(PresentationScene):
         self.end_fragment()
 
 
+        rect = mn.Rectangle(width=20, height=20, fill_color=mn.BLACK, fill_opacity=1)
+        self.play(mn.FadeIn(rect, shift=mn.UP))
+        self.end_fragment()
+
+
 
 class PermutationTopology(PresentationScene):
     def construct(self):
@@ -152,6 +159,8 @@ class PermutationTopology(PresentationScene):
         edges = [(1, 2), (1, 3), (1, 4), (4, 5), (4, 6), (2, 7), (2, 8), (3, 9), (3, 10), (3, 11), (10, 12), (12, 13), (12, 14), (14, 15), (2, 16)]
         graph = mn.Graph(vertices, edges, layout_scale=3).scale(2.5)
         self.play(mn.Create(graph))
+        self.end_fragment()
+        self.play(mn.FadeOut(mn.Group(*self.mobjects), shift=mn.UP))
         self.end_fragment()
 
 class PropertyP(PresentationScene):
