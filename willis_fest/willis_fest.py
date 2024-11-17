@@ -8,15 +8,15 @@ mn.config.video_dir= "./videos"
 
 class IntroText(PresentationScene):
     def construct(self):
-        title = mn.Tex("The ", "Scale Function ", "Values of ", "$(P)$-closed Groups ", r"\\Acting On Trees")
-        self.play(mn.Write(title))
+        title = mn.Tex("The ", "Scale Function ", "Values of ", "$(P)$-closed Groups ", r"\\Acting On Trees", r"\textsuperscript{*}")
+        self.play(*[mn.Write(t) for t in title[0:5]])
         self.end_fragment()
+        self.play(mn.GrowFromCenter(title[5]), mn.Flash(title[5]))
 
-        self.play(mn.Indicate(title[3]))
         self.end_fragment()
 
         animations = []
-        for i in range(0, 5):
+        for i in range(0, 6):
             if i not in {1}:
                 animations.append(mn.FadeOut(title[i], scale=0.2))
 
@@ -138,15 +138,16 @@ class ScaleSection(PresentationScene):
         self.end_fragment()
         self.play(mn.Indicate(brace_r_2))
         self.end_fragment()
-        self.play(mn.Indicate(brace_down))
-        self.end_fragment()
-        self.play(mn.Indicate(brace_d_2))
-        self.end_fragment()
 
 
 
 class PermutationTopology(PresentationScene):
     def construct(self):
+        title = mn.Tex("Permutation Topology")
+        self.play(mn.Write(title))
+        self.end_fragment()
+        self.play(mn.Unwrite(title))
+        self.end_fragment()
         vertices = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
         edges = [(1, 2), (1, 3), (1, 4), (4, 5), (4, 6), (2, 7), (2, 8), (3, 9), (3, 10), (3, 11), (10, 12), (12, 13), (12, 14), (14, 15), (2, 16)]
         graph = mn.Graph(vertices, edges, layout_scale=3).scale(2.5)
@@ -155,6 +156,11 @@ class PermutationTopology(PresentationScene):
 
 class PropertyP(PresentationScene):
     def construct(self):
+        title = mn.Tex("Property ($P$)")
+        self.play(mn.Write(title))
+        self.end_fragment()
+        self.play(mn.Unwrite(title))
+        self.end_fragment()
         START_NO = -7
         vertices = [mn.Dot(mn.LEFT*i*2) for i in range(-1*START_NO + 1, 0, -1)] + [mn.Dot(mn.ORIGIN)] + [mn.Dot(mn.RIGHT*i*2) for i in range(1, -1*START_NO + 2)]
         edges = [mn.Line(start=d1.get_center(), end=d2.get_center()) for d1, d2 in zip(vertices[:-1], vertices[1:])]
@@ -301,7 +307,7 @@ class PropertyP(PresentationScene):
 
         text_1 = r"The group $F_{x}$ is the permutation group obtained by restricting $G_{C}$ to $T_{x}$."
         text_2 = r"The natural map \[\Phi : G_{C} \to \prod_{x \in C} F_{x}\] is an injective homomorphism."
-        text_3 = r"If it is an isomorphism for every finite and (bi)infinite path then $G$ satisfies Property-($P$)."
+        text_3 = r"If it is an isomorphism for every finite and (bi)infinite path then $G$ satisfies Property ($P$)."
 
         b_list = mn.BulletedList(text_1, text_2, text_3, height=2, width=10).shift(1.5*mn.DOWN)
         for i, row in enumerate(b_list):
@@ -708,6 +714,7 @@ class TranslationAxes(PresentationScene):
 
         title = mn.Tex("Translation Axes")
         self.play(mn.Write(title))
+        self.end_fragment()
         self.play(title.animate.shift(3*mn.UP))
         text1 = r"There are three ways an automorphism can act: fix a vertex, fix an edge, and translate."
         text2 = r"In a locally finite tree $G_F$ is compact for any finite set $F$."
@@ -736,7 +743,6 @@ class TranslationAxes(PresentationScene):
         whole_group = mn.Group(*[obj for obj in self.mobjects])
         dist = title.get_center() - text7.get_center()
         self.play(whole_group.animate.shift(dist))
-        self.end_fragment()
 
         cc_text = mn.Tex("Multi-coloured",  " Circuits").move_to(text7.get_center())
         self.play(mn.ReplacementTransform(text7, cc_text))
@@ -853,7 +859,6 @@ class TranslationAxes(PresentationScene):
 
         remove_grp = mn.VGroup(lad, blist, cc_intro)
         self.play(remove_grp.animate.shift(8*mn.DOWN))
-        self.end_fragment()
 
         self.remove(remove_grp)
         c_cover = mn.Tex("Circuit Covers").move_to(cc_text.get_center())
@@ -910,6 +915,7 @@ class TranslationAxes(PresentationScene):
         remove_grp = mn.VGroup(*verts, *edges, old_lad)
 
         self.play(mn.FadeOut(remove_grp, shift=mn.DOWN), mn.ReplacementTransform(c_cover, admissible_text))
+        self.end_fragment()
 
         ad_intro = mn.Tex(r"A coloured circuit is admissible if for each $i \in \{0, 1, \dots, l-1\}$", font_size=40).next_to(admissible_text, mn.DOWN, 1)
         text1 = r"If $X_{a_{i}} \not= X_{\overline{a_{i-1}}}$ then $D_{\overline{a_{i-1}}} \times C_{a_{i}}$ is an orbit of the action of $G(o(a_{i}))$ on $X_{\overline{a_{i-1}}} \times X_{a_{i}}$"
@@ -993,25 +999,28 @@ class TranslationAxes(PresentationScene):
 
         flash = [edges[0].copy().set_color(mn.YELLOW), edges[2].copy().set_color(mn.YELLOW), edges[4].copy().set_color(mn.YELLOW), edges[6].copy().set_color(mn.YELLOW)]
 
+        flash_two = [e.copy().set_color(mn.ORANGE) for e in flash]
+        flash_two = flash_two + flash_two
+
         for i, segment in enumerate(flash):
-            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+            self.play(mn.ShowPassingFlash(segment, rate_func=lin_func, time_width=0.4))
 
         self.end_fragment()
 
-        for i, segment in enumerate(flash + flash):
-            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+        for i, segment in enumerate(flash_two):
+            self.play(mn.ShowPassingFlash(segment, rate_func=lin_func, time_width=0.4), run_time=0.5)
 
         self.end_fragment()
 
         for i, segment in enumerate(flash[2:] + flash[:2]):
-            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+            self.play(mn.ShowPassingFlash(segment, rate_func=lin_func, time_width=0.4))
 
         self.end_fragment()
 
         flash = [edges[1].copy().set_color(mn.YELLOW), edges[7].copy().set_color(mn.YELLOW), edges[5].copy().set_color(mn.YELLOW), edges[3].copy().set_color(mn.YELLOW)]
 
         for i, segment in enumerate(flash):
-            self.play(mn.ShowPassingFlash(segment, rage_func=lin_func, time_width=0.4))
+            self.play(mn.ShowPassingFlash(segment, rate_func=lin_func, time_width=0.4))
 
         self.end_fragment()
 
@@ -1032,7 +1041,7 @@ def createParagraph(title, text, paragraph_width_in_cm, font_size=48):
     return paragraph_title, paragraph_text, paragraph
 
 
-class ScaleSection(PresentationScene):
+class ScaleProofSection(PresentationScene):
     def construct(self):
         scale_text = mn.Tex("Scale Values of (P)-closed Groups")
 
@@ -1044,7 +1053,7 @@ class ScaleSection(PresentationScene):
 
         scale_para = mn.Tex(r"If $\mathcal{C} = ((a_i), (C_{a_i}), (D_{\overline{a_i}}))$ is a minimal admissible \\ coloured circuit of length $l$ and $g$ is a translation of length $L$ \\ along a corresponding translation axis then}", font_size=48).shift(3*mn.UP)
 
-        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_i\right|\right)^{L/l}")
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}")
 
         _, scale_para, _ = createParagraph("blah", r"If $\mathcal{C} = ((a_i), (C_{a_i}), (D_{\overline{a_i}}))$ is a minimal admissible coloured circuit of length $l$ and $g$ is a translation of length $L$ along a corresponding translation axis then}", 8, font_size=48)
         scale_para = scale_para.shift(2.75*mn.UP)
@@ -1203,7 +1212,7 @@ class ScaleSection(PresentationScene):
 
         old_vert_labels = []
         old_vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$gx_{{{0}}}$").move_to(2*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$gx_{{{0}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
         old_vert_labels.append(mn.Tex(f"$g^2x_{{{0}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
         old_vert_labels.append(mn.Tex(f"$g^3x_{{{0}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
         old_vert_labels.append(mn.Tex(f"$g^{-1}x_{{{0}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
@@ -1287,11 +1296,216 @@ class ScaleSection(PresentationScene):
         self.play(mn.FadeIn(os[3], shift=mn.UP))
         self.end_fragment()
 
-        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_i\right|\right)^{L/l}").move_to(os.get_center())
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}").move_to(os.get_center())
         
         self.play(mn.FadeOut(os, shift=mn.UP), mn.FadeOut(scale_text[0], shift=mn.UP), mn.FadeIn(scale_value, shift=mn.UP))
         self.end_fragment()
 
         screen_grp = mn.Group(half_tree, swap_new, tree_two-swap_two, tree_three, scale_value, *vert_labels[1:], old_vert_labels[0])
         self.play(mn.FadeOut(screen_grp, shift=mn.UP))
+        self.end_fragment()
+
+class ExampleScene(PresentationScene):
+    def construct(self):
+        title = mn.Tex("Examples")
+        aut_t3 = mn.MathTex(r"\operatorname{Aut}(T_3)")
+
+        self.play(mn.Write(title))
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(title, aut_t3))
+        self.end_fragment()
+
+        bez_point1 = 2*(mn.UP + 1*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 1*mn.LEFT)
+        curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.RED)
+
+        dot = mn.Dot(mn.ORIGIN, z_index=1)
+        vert_label = mn.MathTex(r"S_3").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        curve_label = mn.MathTex(r"\{1, 2, 3\}").move_to(2*mn.UP).scale(0.75)
+        lad = mn.VGroup(curve, dot, vert_label, curve_label).scale(1.75)
+        lad = lad.shift(-1*lad.get_center())
+
+
+
+        #animations = [
+        #        mn.Create(dot),
+        #        mn.GrowFromPoint(curve, dot.get_center()),
+        #        mn.GrowFromPoint(vert_label, dot.get_center()),
+        #        mn.GrowFromPoint(curve_label, dot.get_center()),
+        #        aut_t3.animate.shift(3*mn.LEFT - 1*mn.UP)
+        #        ]
+
+        self.play(mn.ReplacementTransform(aut_t3, lad))
+        self.end_fragment()
+
+        #equations = mn.MathTex(r"s(g) &= 2", r"\\&= \times_1^2 x \\&= g").shift(2*mn.RIGHT)
+        #for g in equations:
+        #    self.play(mn.Write(g))
+        #self.wait(1)
+        #self.end_fragment()
+
+        self.play(lad.animate.shift(3*mn.LEFT))
+
+        equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_3\right)_{1}\cdot 2\right|\right)^{L/1}",
+                r"\\   &= 2^{L}",
+                ]
+
+        equations = mn.MathTex(*equations)
+        equations.shift(3*mn.RIGHT)
+
+        for eq in equations:
+            self.play(mn.Write(eq))
+            self.end_fragment()
+
+
+        new_vert_label = mn.MathTex(r"S_d").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75).scale(1.75).move_to(vert_label.get_center())
+        new_curve_label = mn.MathTex(r"\{1, 2, \dots, d\}").move_to(2*mn.UP).scale(0.75).scale(1.75).shift(3*mn.LEFT).move_to(curve_label.get_center())
+        new_equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_d\right)_{1}\cdot 2\right|\right)^{L/1}",
+                r"\\   &= (d-1)^{L}",
+                ]
+        new_equations = mn.MathTex(*new_equations).move_to(equations.get_center() + 0.07*mn.DOWN)
+
+        animations = [mn.ReplacementTransform(g, h) for g, h in zip([vert_label, curve_label, equations], [new_vert_label, new_curve_label, new_equations])]
+
+        self.play(mn.AnimationGroup(*animations))
+        self.end_fragment()
+
+        old_stuff = mn.VGroup(new_vert_label, new_curve_label, new_equations, dot, curve)
+        
+        # Start of focal stuff.
+        verts = [mn.Dot(mn.LEFT + mn.DOWN, z_index=1, color=mn.ORANGE), mn.Dot(mn.LEFT + mn.UP, z_index=1), mn.Dot(mn.RIGHT + mn.UP, z_index=1, color=mn.ORANGE), mn.Dot(mn.RIGHT + mn.DOWN, z_index=1)]
+        edges = []
+
+        labels = [mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3\}"), mn.MathTex(r"\{4\}")]
+
+        def bez_edge(start, end, color, direction, label=None):
+            l_point = start.get_center()
+            r_point = end.get_center()
+            scale = np.sqrt((r_point[1]-l_point[1])**2 + (r_point[0]-l_point[0])**2)
+            l_point = start.get_center()
+            r_point = scale*mn.RIGHT + start.get_center()
+            bez_point1 = scale*(0.25*direction + 0.25*mn.RIGHT) + l_point
+            bez_point2 = scale*(0.25*direction + 0.25*mn.LEFT) + r_point # Maybe? 
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point2, r_point, color=color)
+            if label is not None:
+                label = labels[label].copy().move_to(curve.point_from_proportion(0.5)).shift(0.3*direction).scale(0.6)
+            if end.get_center()[0] < start.get_center()[0]:
+                if label is not None:
+                    label = label.rotate(np.pi)
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            if label is not None:
+                grp = mn.VGroup(curve, label, tip)
+            else:
+                grp = mn.VGroup(curve, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
+
+        for i, j in zip(range(0, 4), range(1, 5)):
+            v1 = verts[(i % 4)]
+            v2 = verts[(j % 4)]
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, label=0))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, label=1))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, label=2))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, label=1))
+
+        last_vert = mn.Dot(mn.LEFT + mn.DOWN + 2*mn.RIGHT*np.cos(np.pi*5/4) + 2*mn.UP*np.sin(np.pi*5/4), z_index=1)
+
+        e1 = bez_edge(last_vert, verts[0], mn.BLUE, mn.UP, label=1)
+        e2 = bez_edge(verts[0], last_vert, mn.GREEN, mn.UP, label=2)
+
+        verts.append(last_vert)
+        edges = edges + [e1, e2]
+
+        focal_lad = mn.VGroup(*verts, *edges).scale(1.25)
+
+        self.play(mn.ShrinkToCenter(old_stuff))
+        self.end_fragment()
+
+        self.play(mn.GrowFromCenter(focal_lad))
+        self.end_fragment()
+
+        self.play(mn.Indicate(e2))
+        self.end_fragment()
+        self.play(mn.Indicate(e1[1]))
+        self.end_fragment()
+
+        self.play(mn.Indicate(mn.VGroup(*verts[:-1], *edges[:-2])))
+        self.end_fragment()
+
+        self.play(focal_lad.animate.shift(3.4*mn.LEFT))
+        equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\left|(C_2)_1\cdot 3\right| \times \left|(1)_4\cdot 3\right|\times \left|(C_2)_1\cdot 3\right| \times \left|(1)_4\cdot 3\right|\right)^{L/4}",
+                r"\\   &= 1^{n}",
+                ]
+
+        equations = mn.MathTex(*equations, font_size=28)
+        equations.shift(3.4*mn.RIGHT)
+        equations[1].set_color(mn.RED)
+        equations[2].set_color(mn.RED)
+
+        self.play(mn.Write(equations[0]))
+        self.end_fragment()
+        self.play(mn.Write(equations[1]))
+        self.end_fragment()
+        self.play(mn.Indicate(verts[0]))
+        self.end_fragment()
+        self.play(mn.Indicate(verts[3]))
+        self.end_fragment()
+        self.play(mn.Indicate(verts[2]))
+        self.end_fragment()
+        self.play(mn.Indicate(verts[1]))
+        self.end_fragment()
+        self.play(mn.Write(equations[2]))
+        self.end_fragment()
+
+
+        new_equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\left|(C_2)_3\cdot 1\right| \times \left|(1)_3\cdot 4\right|\times \left|(C_2)_3\cdot 1\right| \times \left|(1)_3\cdot 4\right|\right)^{L/4}",
+                r"\\   &= 4^{n}",
+                ]
+
+        new_equations = mn.MathTex(*new_equations, font_size=28)
+        new_equations.shift(3.4*mn.RIGHT)
+        new_equations[1].set_color(mn.BLUE)
+        new_equations[2].set_color(mn.BLUE)
+
+        self.play(mn.Unwrite(equations[1]), mn.Unwrite(equations[2]))
+        self.end_fragment()
+
+        self.play(mn.Write(new_equations[1]))
+        self.end_fragment()
+        self.play(mn.Write(new_equations[2]))
+        self.end_fragment()
+
+        scene = mn.VGroup(equations[0], new_equations[1], new_equations[2], focal_lad)
+
+        final = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|X_a\right|\right)^{L/l}")
+
+        self.play(mn.ReplacementTransform(scene, final))
+        self.end_fragment()
+
+        self.play(mn.ShrinkToCenter(final))
+        self.end_fragment()
+
+class Ending(PresentationScene):
+    def construct(self):
+        _, bib_para, _ = createParagraph("blah", r"[1] A. Brehm, M. Gheysens, A. Le Boudec, and R. Rollin, ``The scale function and tidy subgroups,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 145--160 \\{} [2] M. Chijoff and S. Tornier, Discrete (P)-closed Groups Acting On Trees. 2024. [Online]. Available: https://arxiv.org/abs/2409.13240 \\{} [3] C. D. Reid and S. M. Smith, Groups acting on trees with Tits' independence property (P). 2022. [Online]. Available: https://arxiv.org/abs/2002.11766 \\{} [4] A. Garrido, Y. Glasner, and S. Tornier, ``Automorphism groups of trees: generalities and prescribed local actions,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 92--116 \\{} [5] G. Willis, ``The structure of totally disconnected locally compact groups,'' Mathematische Annalen, vol. 300, no. 1, pp. 341--363, Sep. 1994, doi: https://doi.org/10.1007/bf01450491.", 9, font_size=38)
+
+        bib_para.shift((-1*bib_para.get_top()-8*mn.UP))
+        self.add(bib_para)
+        self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=6, rate_fun=mn.rate_functions.linear)
+        self.end_fragment()
+
+        q = mn.Text("?").scale(2.5)
+        self.play(mn.Write(q))
         self.end_fragment()
