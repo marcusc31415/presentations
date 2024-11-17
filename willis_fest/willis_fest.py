@@ -1245,7 +1245,7 @@ class ScaleProofSection(PresentationScene):
         _, u_plus_para, _ = createParagraph("blah", r"One application of the tidying procedure gives us the subgroup", 8, font_size=40)
         u_plus_para = u_plus_para.shift(0.5*mn.DOWN)
         u_text = mn.MathTex(r"U = G_{x_0} \cap gG_{x_0}g^{-1} = G_{x_0} \cap G_{gx_0} = G_{x_0, x_1}").shift(1.75*mn.DOWN)
-        _, u_plus_after, _ = createParagraph("blah", r"We can show that $U$ is tidy for $G_{x_0}$ and that", 8, font_size=40)
+        _, u_plus_after, _ = createParagraph("blah", r"We can show that $U$ is tidy for $g$ and that", 8, font_size=40)
         u_plus_after = u_plus_after.shift(1.25*mn.DOWN)
         u_plus_text = mn.MathTex(r"U_+ = \bigcap_{i=0}^{\infty}g^iG_{x_0}g^{-i} = G_{x_0, x_1, x_2, \dots}").shift(2.75*mn.DOWN)
 
@@ -1453,7 +1453,7 @@ class ExampleScene(PresentationScene):
         equations = [
                 r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
                 r"\\   &= \left(\left|(C_2)_1\cdot 3\right| \times \left|(1)_4\cdot 3\right|\times \left|(C_2)_1\cdot 3\right| \times \left|(1)_4\cdot 3\right|\right)^{L/4}",
-                r"\\   &= 1^{n}",
+                r"\\   &= 1",
                 ]
 
         equations = mn.MathTex(*equations, font_size=28)
