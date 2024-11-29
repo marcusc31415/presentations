@@ -547,6 +547,8 @@ class LocalActionDiagrams(PresentationScene):
         self.play(mn.AnimationGroup(*animations), run_time=3)
         self.end_fragment()
 
+        # BLAH
+
         lad_edges = mn.VGroup(red_curve, blue_curve, green_curve)
 
         l_point = 2*mn.LEFT
