@@ -703,3 +703,100 @@ class LocalActionDiagrams(PresentationScene):
 
         self.play(mn.ShrinkToCenter(whole_scene))
         self.end_fragment()
+
+class TranslationAxes(PresentationScene):
+    def construct(self):
+        title = mn.Tex(r"Translation Axes", font_size=56).move_to(mn.UP*(4-0.75))
+        ul = mn.Underline(title)
+        self.end_fragment()
+        self.add(title, ul)
+        self.end_fragment()
+
+        text1, _, _ = create_paragraph(r"There are three ways an automorphism can act: fix a vertex, fix an edge, and translate.")
+        text2, _, _ = create_paragraph(r"In a locally finite tree $G_F$ is compact for any finite set $F$.")
+        text3, _, _ = create_paragraph(r"This means to find the scale values of a group we need to identify all translations.")
+        blist = mn.VGroup(text1, text2, text3)
+        blist.arrange(mn.DOWN, buff=0.75)
+        blist.next_to(ul, mn.DOWN, buff=1)
+        text2.align_to(text1, mn.LEFT)
+
+        for row in blist:
+            self.add(row)
+            self.end_fragment()
+
+        self.remove(*blist, blist, title, ul)
+        self.end_fragment()
+
+
+        labels = [mn.Tex(f"{i}") for i in range(1, 6)]
+
+        verts = []
+        edges = []
+
+        start = mn.ORIGIN + 12*mn.LEFT
+
+        for i in range(0, 13):
+            pt = start + 2*i*mn.RIGHT
+            verts.append(mn.Dot(pt, z_index=1))
+        
+        i = 0
+        for v1, v2 in zip(verts[:-1], verts[1:]):
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, labels[0]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, labels[2]))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, labels[1]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, labels[3]))
+            i += 1
+
+        trans_axis = mn.VGroup(*verts, *edges)
+
+        self.play(*[mn.GrowFromPoint(v, point=mn.ORIGIN) for v in verts], *[mn.GrowFromPoint(e, point=mn.ORIGIN) for e in edges])
+        self.end_fragment()
+
+
+        self.play(trans_axis.animate.shift(4*mn.LEFT), run_time=1)
+        self.end_fragment()
+        self.play(trans_axis.animate.shift(8*mn.RIGHT), run_time=1)
+        self.end_fragment()
+        self.play(trans_axis.animate.shift(4*mn.LEFT), run_time=1)
+        self.end_fragment()
+
+        v1 = None
+        v2 = None
+        a1 = mn.VGroup()
+        a2 = mn.VGroup()
+
+        for v in verts:
+            if (v.get_center() == mn.ORIGIN).all():
+                v1 = v
+            if (v.get_center() == 2*mn.RIGHT).all():
+                v2 = v
+        
+        for e in edges:
+            if (e[0].point_from_proportion(0) == mn.ORIGIN).all():
+                a1.add(e)
+            if (e[0].point_from_proportion(0) == 2*mn.RIGHT).all():
+                a2.add(e)
+
+        self.play(mn.Indicate(v1), mn.Indicate(a1))
+        self.end_fragment()
+        self.play(mn.Indicate(v2), mn.Indicate(a2))
+        self.end_fragment()
+
+        # Maybe make a nice blist function with this.
+        self.play(trans_axis.animate.shift(2.5*mn.UP))
+        text1, _, _ = create_paragraph(r"Translation axes correspond to `cyclic' parts of local action diagrams.")
+        text2, _, _ = create_paragraph(r"Need conditions on the local actions to ensure we can translate along the axis.")
+        text1.next_to(trans_axis, mn.DOWN, 1)
+        text2.next_to(text1, mn.DOWN, 1)
+
+        for row in [text1, text2]:
+            self.add(row)
+            self.end_fragment()
+
+        self.play(mn.ShrinkToCenter(mn.VGroup(trans_axis, text1, text2)))
+        self.end_fragment()
+
+        
+
