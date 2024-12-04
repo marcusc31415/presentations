@@ -41,6 +41,14 @@ def bez_edge(start, end, color, direction, label=None, label_scale=0.6, shift_la
     grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
     return grp
 
+def transform_colour(scene, mobject, colour=mn.YELLOW):
+        mobject.save_state()
+        obj_scale = mobject.copy().scale(1.2).set_color(colour)
+        obj_colour = mobject.copy().set_color(colour)
+        scene.play(mn.Transform(mobject, obj_scale), run_time=0.5)
+        scene.play(mn.Transform(mobject, obj_colour), run_time=0.5)
+
+
 
 class IntroText(PresentationScene):
     def construct(self):
@@ -799,4 +807,266 @@ class TranslationAxes(PresentationScene):
         self.end_fragment()
 
         
+class ScaleProof(PresentationScene):
+    def construct(self):
+        title = mn.Tex(r"Scale Values", font_size=56).move_to(mn.UP*(4-0.75))
+        ul = mn.Underline(title)
+        self.end_fragment()
+        self.add(title, ul)
+        self.end_fragment()
 
+        text1, _, _ = create_paragraph(r"If $g$ is a translation of length $l$ along an axis labelled by colours from sets $(C_i)_{i=0}^{L-1}$ and $(D_i)_{i=0}^{L-1}$ then")
+        text1.next_to(ul, mn.DOWN, buff=1)
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}").next_to(text1, mn.DOWN, buff=1.25).scale(1.5)
+        scale_value.save_state()
+
+        # found with index_labels
+        vert_str = scale_value[0][14:19] # o(a_i)
+        c_str = scale_value[0][20:22] # c_i
+        d_str = scale_value[0][23:27] # d_i
+
+        self.add(text1)
+        self.end_fragment()
+        self.add(scale_value)
+        self.end_fragment()
+        self.play(mn.Wiggle(scale_value), run_time=0.75)
+        self.end_fragment()
+
+        # Show orbit location on translation axis. 
+        current_grp = mn.VGroup(title, text1, scale_value, ul)
+        self.play(current_grp.animate.shift(3.45*mn.UP))
+        self.end_fragment()
+
+        labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
+
+        verts = []
+        edges = []
+
+        start = mn.ORIGIN + 10*mn.LEFT
+
+        for i in range(0, 10):
+            pt = start + 2*i*mn.RIGHT
+            verts.append(mn.Dot(pt, z_index=1))
+        
+        i = 0
+        for v1, v2 in zip(verts[:-1], verts[1:]):
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.DOWN, labels[0]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.DOWN, labels[2]))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.DOWN, labels[1]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.DOWN, labels[3]))
+            i += 1
+
+        tree = mn.VGroup(*edges, *verts)
+        tree.shift(0.75*mn.DOWN).scale(1.25)
+
+        self.play(*[mn.GrowFromPoint(v, mn.ORIGIN) for v in verts], *[mn.GrowFromPoint(e, mn.ORIGIN) for e in edges])
+        self.end_fragment()
+
+
+        # Vertex formula colour
+        transform_colour(self, vert_str, mn.ORANGE)
+        self.end_fragment()
+        
+        cv = verts[5]
+
+        cv.save_state()
+        cvscale = cv.copy().scale(1.2).set_color(mn.ORANGE)
+        cvcolour = cv.copy().set_color(mn.ORANGE)
+        self.play(mn.Transform(cv, cvscale), run_time=0.5)
+        self.play(mn.Transform(cv, cvcolour), run_time=0.5)
+        self.end_fragment()
+
+        # Edges formula colour
+        edges[10].save_state()
+        edges[9].save_state()
+
+        e10scale = edges[10].copy().scale(1.2).set_color(mn.YELLOW)
+        e10colour = edges[10].copy().set_color(mn.YELLOW)
+        e9scale = edges[9].copy().scale(1.2).set_color(mn.GREEN)
+        e9colour = edges[9].copy().set_color(mn.GREEN)
+
+        transform_colour(self, c_str, mn.YELLOW)
+        self.end_fragment()
+
+        self.play(mn.Transform(edges[10], e10scale), run_time=0.5)
+        self.play(mn.Transform(edges[10], e10colour), run_time=0.5)
+        self.end_fragment()
+
+        transform_colour(self, d_str, mn.GREEN)
+        self.end_fragment()
+
+        self.play(mn.Transform(edges[9], e9scale), run_time=0.5)
+        self.play(mn.Transform(edges[9], e9colour), run_time=0.5)
+        self.end_fragment()
+
+        self.play(*[mn.FadeOut(obj, shift=mn.UP) for obj in self.mobjects])
+
+        mn.Restore(edges[9])
+        mn.Restore(edges[10])
+        mn.Restore(cv)
+        mn.Restore(vert_str)
+        mn.Restore(c_str)
+        mn.Restore(d_str)
+        self.end_fragment()
+
+
+        ######################
+        # Tree Visualisation #
+        ######################
+
+
+        left_verts = [mn.Dot(i*mn.LEFT, z_index=1) for i in range(0, 10)]
+
+        left_edges = []
+
+        for v1, v2, in zip(left_verts[:-1], left_verts[1:]):
+            left_edges.append(mn.Line(v1.get_center(), v2.get_center()))
+
+        base_tree_verts = mn.VGroup(*left_verts)
+        base_tree_edges = mn.VGroup(*left_edges)
+
+
+        def create_branch(base, rotation=-1*np.pi/3, copy_branch=None, test=None):
+            if copy_branch is None:
+                base_v = base_tree_verts
+                base_e = base_tree_edges
+            else:
+                base_v = base_tree_verts
+                base_e = base_tree_edges
+                #base_v = copy_branch[0]
+                #base_e = copy_branch[1]
+            if test is None:
+                fb_v = base_v.copy().shift(base).rotate(rotation, about_point=base)
+                fb_e = base_e.copy().shift(base).rotate(rotation, about_point=base)
+            else:
+                fb_v = base_v.copy().shift(base)
+                fb_e = base_e.copy().shift(base)
+            return [fb_v, fb_e, base]
+
+        branches = []
+
+        branches.append(create_branch(3*mn.LEFT)) # 18
+        branches.append(create_branch(6*mn.LEFT)) # 36
+        branches.append(create_branch(9*mn.LEFT)) # 54
+        branches.append(create_branch(branches[0][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 72
+        branches.append(create_branch(branches[1][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 90
+        branches.append(create_branch(branches[2][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 108
+
+
+        half_tree = mn.VGroup(*left_verts, *left_edges)
+        for b in branches:
+            half_tree.add(*b[0], *b[1])
+
+        tree_two = half_tree.copy() #[8] is last vertex. 
+        tree_two.shift(9*mn.RIGHT)
+
+        tree_three = tree_two.copy().shift(9*mn.RIGHT)
+        whole_tree = mn.VGroup(half_tree, tree_two, tree_three).shift(mn.UP)
+
+        self.play(mn.FadeIn(whole_tree, shift=mn.UP))
+        self.end_fragment()
+
+        self.play(whole_tree.animate.shift(6*mn.LEFT))
+        self.end_fragment()
+        self.play(whole_tree.animate.shift(-6*mn.LEFT))
+        self.end_fragment()
+
+        old_vert_labels = []
+        old_vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$gx_{{{0}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^2x_{{{0}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^3x_{{{0}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^{-1}x_{{{0}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        old_vert_labels.append(mn.Tex(f"$g^{-2}x_{{{0}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+
+        vert_labels = []
+        vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{1}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{2}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{3}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{-1}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+        vert_labels.append(mn.Tex(f"$x_{{{-2}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
+
+
+        self.play(*[mn.Write(v) for v in old_vert_labels])
+        self.end_fragment()
+
+        self.play(*[mn.ReplacementTransform(i, j) for i, j in zip(old_vert_labels[1:], vert_labels[1:])])
+        self.end_fragment()
+
+        u_plus_para, _, _ = create_paragraph(r"Applying the tidying procedure to $G_{x_0}$ gives us the subgroup\phantom{blah}", font_size=42)
+        u_plus_para = u_plus_para.shift(0.5*mn.DOWN)
+        u_text = mn.MathTex(r"U =  G_{x_0, x_1}").shift(1.75*mn.DOWN).scale(1.5)
+        u_plus_after, _, _ = create_paragraph(r"We can show that $U$ is tidy for $g$ and that", font_size=42)
+        u_plus_after = u_plus_after.shift(1.25*mn.DOWN)
+        u_plus_text = mn.MathTex(r"U_+ =  G_{x_0, x_1, x_2, \dots}").shift(2.75*mn.DOWN).scale(1.5)
+
+        self.add(u_plus_para)
+        self.end_fragment()
+        self.add(u_text)
+        grp = mn.VGroup(u_plus_para, u_text)
+        self.end_fragment()
+
+        self.play(mn.AnimationGroup(grp.animate.shift(1.25*mn.UP), mn.FadeOut(u_plus_para, shift=1.25*mn.UP)))
+        self.add(u_plus_after)
+        self.end_fragment()
+        self.add(u_plus_text)
+        self.end_fragment()
+
+        indicate_ray = mn.VGroup(half_tree[0], tree_two[0:19], tree_three[0:19])
+        indicate_ray_two = mn.VGroup(tree_two[0:7] + tree_two[10:16], tree_three[0:19])
+
+        self.play(indicate_ray.animate.set_color(mn.YELLOW))
+        self.end_fragment()
+        scale_text = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : G_{x_0, x_1, x_2, \dots}\right|").move_to(u_plus_after.get_center())
+        text_grp = mn.VGroup(u_text, u_plus_after, u_plus_text)
+        self.play(mn.FadeOut(text_grp, shift=mn.RIGHT))
+        self.end_fragment()
+        self.add(scale_text)
+        self.end_fragment()
+        self.play(indicate_ray_two.animate.set_color(mn.GREEN))
+        self.end_fragment()
+
+        nt = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : \left(G_{x_1, x_2, x_3, \dots}\right)_{x_0} \right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
+        os = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} \cdot x_0\right|", r"= 2", r"= 2 \times 1 \times 1").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
+        #nt.next_to(scale_text[1], direction=mn.LEFT)
+
+        #self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt, shift=mn.UP))
+        self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt[1], shift=mn.UP))
+        self.end_fragment()
+        self.play(mn.FadeOut(nt[1], shift=mn.UP), mn.FadeIn(os[1], shift=mn.UP))
+        self.end_fragment()
+
+        self.play(mn.Indicate(half_tree[0], color=mn.RED), mn.Indicate(tree_two[9], color=mn.RED), mn.Indicate(old_vert_labels[0], color=mn.RED))
+        self.end_fragment()
+
+        swap_one = mn.VGroup(half_tree, tree_two[7:10], tree_two[16:19], tree_two[54:72], tree_two[108:])
+        swap_two = mn.VGroup(tree_two[54-18:72-18], tree_two[90:108])
+
+        swap_new = swap_one.copy().rotate(angle=-np.pi/3, about_point=3*mn.RIGHT + mn.UP).set_color(mn.WHITE)
+
+        self.add(swap_new)
+        swap_two.set_opacity(0)
+
+
+        self.play(mn.Rotate(swap_one, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
+                  mn.Rotate(swap_new, angle=np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
+                  *[mn.Rotate(vl, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP) for vl in [old_vert_labels[0], vert_labels[4], vert_labels[5]]])
+        self.end_fragment()
+
+
+        self.play(mn.FadeIn(os[2], shift=mn.UP))
+        self.end_fragment()
+        self.play(mn.FadeIn(os[3], shift=mn.UP))
+        self.end_fragment()
+
+        scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}").move_to(mn.ORIGIN + mn.UP*os.get_center()[1]).scale(1.25)
+        
+        self.play(mn.FadeOut(os, shift=mn.UP), mn.FadeOut(scale_text[0], shift=mn.UP), mn.FadeIn(scale_value, shift=mn.UP))
+        self.end_fragment()
+
+        screen_grp = mn.Group(half_tree, swap_new, tree_two-swap_two, tree_three, scale_value, *vert_labels[1:], old_vert_labels[0])
+        self.play(mn.FadeOut(screen_grp, shift=mn.UP))
+        self.end_fragment()
