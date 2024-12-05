@@ -62,14 +62,14 @@ class ScaleDef(PresentationScene):
     def construct(self):
         self.end_fragment()
         title = mn.Tex("The Scale Function", font_size=56).move_to(mn.UP*(4-0.75))
-        self.add(title, mn.Underline(title))
+        self.add(title, ul := mn.Underline(title))
         self.end_fragment()
 
         text1 = [r"The scale function is defined on any ", r"totally disconnected locally compact group", r"."]
         lin_op = mn.MathTex(r"\lambda : \mathcal{L}(V) \to \mathbb{C}")
         scale_op = mn.MathTex(r"s : \operatorname{Aut}(G) \to \mathbb{N}")
         inner_aut = mn.MathTex(r"x \mapsto gxg^{-1}")
-        text2 = r"Can be made a function from $G$ to $\mathbb{N}$ using inner automorphisms."
+        text2 = r"Can be made a function from $G$ to $\mathbb{N}$ using conjugation."
 
         para_1, _, _ = create_paragraph(*text1)
         para_1[2].set_color(mn.YELLOW)
@@ -92,8 +92,29 @@ class ScaleDef(PresentationScene):
         self.add(inner_aut)
         self.end_fragment()
 
+        self.remove(*[x for x in self.mobjects if x not in set([title, ul])])
+        self.end_fragment()
+
+        scale_def = mn.MathTex(r"s(g) = \min_{U \in \mathrm{CO}(G)}\left|\alpha(U) : \alpha(U) \cap U\right|").next_to(title, mn.DOWN, 1)
+        para_3, _, _ = create_paragraph("G. Willis showed that $U$ is minimal if and only if it is ", r"tidy", r".")
+        para_3.next_to(scale_def, mn.DOWN, 0.5)
+        para_3[2].set_color(mn.YELLOW)
+        para_4, _, _ = create_paragraph("If $U$ is tidy then it has a decomposition $U = U_{+}U_{-}$ and:")
+        para_4.next_to(para_3, mn.DOWN, 1).align_to(para_3, mn.LEFT)
+        scale_def_2 = mn.MathTex(r"s(g) = \left|\alpha(U_+) : U_+\right|").next_to(para_4, mn.DOWN, 0.5)
+
+        self.add(scale_def)
+        self.end_fragment()
+        self.add(para_3)
+        self.end_fragment()
+        self.add(para_4)
+        self.end_fragment()
+        self.add(scale_def_2)
+        self.end_fragment()
+
         self.remove(*self.mobjects)
         self.end_fragment()
+
 
         ### Scale Visualisation ###
         # Display the group in the centre. 
@@ -147,7 +168,7 @@ class ScaleDef(PresentationScene):
         circle_2.move_to(4*mn.RIGHT)
         circle_2_label = mn.Tex(r"$\alpha(G)$", font_size=36)
         circle_2_label.move_to(circle_2.get_center() + (mn.UP + mn.LEFT)*3/np.sqrt(2)*1.2)
-        rect_2 = mn.Rectangle(height=2, width=2, fill_color=mn.GREY, fill_opacity=1)
+        rect_2 = mn.Rectangle(height=3, width=1, fill_color=mn.GREY, fill_opacity=1)
         rect_2.move_to(4*mn.RIGHT + mn.DOWN)
         rect_2.align_to(rect_1, mn.DOWN)
 
@@ -183,6 +204,12 @@ class ScaleDef(PresentationScene):
         self.play(mn.Indicate(brace_r_2))
         self.end_fragment()
 
+        self.play(mn.Indicate(brace_down))
+        self.end_fragment()
+        self.play(mn.Indicate(brace_d_2))
+        self.end_fragment()
+
+
 
         rect = mn.Rectangle(width=20, height=20, fill_color=mn.BLACK, fill_opacity=1)
         self.play(mn.FadeIn(rect, shift=mn.UP))
@@ -192,16 +219,26 @@ class ScaleDef(PresentationScene):
 class PropertyP(PresentationScene):
     def construct(self):
         self.end_fragment()
-        title = mn.Tex(r"Property ($P$)")
-        self.add(title)
+        title = mn.Tex(r"Property ($P$)", font_size=56).move_to(mn.UP*(4-0.75))
+        self.add(title, ul := mn.Underline(title))
         self.end_fragment()
-        self.remove(title)
+
+        para_1, _, _ = create_paragraph(r"For a tree $T$, we make $\operatorname{Aut}(T)$ a ", r"t.d.l.c.\ ", r"group with the permutation topology.")
+        para_1.next_to(title, mn.DOWN, 1)
+        para_1[2].set_color(mn.YELLOW)
+
+        self.add(para_1)
+        self.end_fragment()
+
         START_NO = -7
-        vertices = [mn.Dot(mn.LEFT*i*2) for i in range(-1*START_NO + 1, 0, -1)] + [mn.Dot(mn.ORIGIN)] + [mn.Dot(mn.RIGHT*i*2) for i in range(1, -1*START_NO + 2)]
+        vertices = [mn.Dot(mn.LEFT*i*2, z_index=1) for i in range(-1*START_NO + 1, 0, -1)] + [mn.Dot(mn.ORIGIN, z_index=1)] + [mn.Dot(mn.RIGHT*i*2, z_index=1) for i in range(1, -1*START_NO + 2)]
         edges = [mn.Line(start=d1.get_center(), end=d2.get_center()) for d1, d2 in zip(vertices[:-1], vertices[1:])]
+        bez_edges = [[bez_edge(d1, d2, mn.RED, mn.UP), bez_edge(d2, d1, mn.BLUE, mn.UP)] for d1, d2 in zip(vertices[:-1], vertices[1:])]
 
         end_group = mn.VGroup()
-
+        bez_edge_group = mn.VGroup(*[v for v in vertices])
+        for e in bez_edges:
+            bez_edge_group.add(*e)
         for v in vertices:
             end_group.add(v)
         for e in edges:
@@ -209,11 +246,14 @@ class PropertyP(PresentationScene):
         #self.play(mn.GrowFromPoint(end_group, mn.ORIGIN))
 
 
+
+
         #self.play(*[mn.Create(v) for v in vertices])
         #self.play(*[mn.Create(e) for e in edges])
 
         branch_vertices = []
         branch_edges = []
+        branch_bez_edges = []
         ellipses_groups = []
 
         for vert_no, base_vertex in enumerate(vertices):
@@ -268,12 +308,61 @@ class PropertyP(PresentationScene):
             ee += edge
             tt += text
 
+        self.play(mn.GrowFromCenter(bez_edge_group))
+        self.end_fragment()
+
+        cv = None
+        e1 = None
+        e2 = None
+
+        for v in vertices:
+            if (v.get_center() == mn.ORIGIN).all():
+                cv = v
+
+        for e in bez_edges:
+            if (np.linalg.norm(e[0][0].point_from_proportion(0) - mn.ORIGIN) < 0.01 and np.linalg.norm(e[1][0].point_from_proportion(1) - mn.ORIGIN) < 0.01):
+                e1 = e[0]
+                e2 = e[1]
         
-        self.add(*end_group, *vv, *ee, *tt)
+        self.play(mn.Indicate(cv))
+        self.end_fragment()
+        self.play(mn.Indicate(e1))
+        self.end_fragment()
+        self.play(mn.Indicate(e2))
+        self.end_fragment()
+
+        self.play(*[mn.FadeOut(o, shift=mn.UP) for o in [title, ul, para_1]])
+        self.end_fragment()
+
+        animations = []
+        for be, e in zip(bez_edges, edges):
+            obj = mn.VGroup(*be)
+            animations.append(mn.ReplacementTransform(obj, e))
+        
+        self.play(mn.AnimationGroup(*animations))
+        self.end_fragment()
+
+        animations = []
+        for base, vert, edge, text in zip(vertices, branch_vertices, branch_edges, ellipses_groups):
+            for v in vert:
+                animations.append(mn.GrowFromPoint(v, base.get_center()))
+            for e in edge:
+                animations.append(mn.GrowFromPoint(e, base.get_center()))
+            for t in text:
+                animations.append(mn.GrowFromPoint(t, base.get_center()))
+
+        self.play(mn.AnimationGroup(*animations))
+
         self.end_fragment()
 
         self.play(mn.Indicate(end_group))
         self.end_fragment()
+
+        tree = mn.VGroup(*vertices, *edges)
+        for bv, be, eg in zip(branch_vertices, branch_edges, ellipses_groups):
+            tree.add(*bv)
+            tree.add(*be)
+            tree.add(*eg)
 
         branch_group = mn.VGroup(vertices[-1*START_NO+1])
         for vert in branch_vertices[-1*START_NO+1]:
@@ -294,6 +383,9 @@ class PropertyP(PresentationScene):
         rotate_group.add(ellipses_groups[-1*START_NO+1])
 
         self.play(mn.Rotate(rotate_group, angle=np.pi, axis=np.array([0, 1, 0]), about_point=branch_vertices[-1*START_NO+1][0].get_center()))
+        self.end_fragment()
+
+        self.play(mn.FadeOut(tree, shift=mn.UP))
         self.end_fragment()
 
 class LocalActionDiagrams(PresentationScene):
@@ -325,6 +417,19 @@ class LocalActionDiagrams(PresentationScene):
         self.add(lad_1)
         self.end_fragment()
 
+        why_text = mn.Tex("Why?").scale(2)
+
+        self.add(why_text)
+        self.end_fragment()
+
+        because_text = mn.Tex(r"They are in a one-to-one correspondence with conjugacy classes of \\ $(P)$-closed groups and properties of the group are \\ reflected in them.", font_size=38, should_center=True).shift(2*mn.DOWN)
+
+        self.add(because_text)
+        self.end_fragment()
+
+        self.remove(why_text, because_text)
+        self.end_fragment()
+
         graph = mn.VGroup(blue_curve, red_curve, green_curve, lad_dot)
         edge_labels = mn.VGroup(red_label, blue_label, green_label)
 
@@ -348,20 +453,12 @@ class LocalActionDiagrams(PresentationScene):
             self.end_fragment()
 
 
-        why_text = mn.Tex("Why?").scale(2)
 
         self.remove(lad_desc)
         for row in lad_list:
             self.remove(row)
-        self.add(why_text)
-        self.end_fragment()
+        self.remove(*lad_1)
 
-        because_text = mn.Tex(r"They are in a one-to-one correspondence with conjugacy classes of \\ $(P)$-closed groups and properties of the group are \\ reflected in them.", font_size=38, should_center=True).shift(2*mn.DOWN)
-
-        self.add(because_text)
-        self.end_fragment()
-
-        self.remove(why_text, because_text, *lad_1)
         self.end_fragment()
 
         # Tree Construction # 
@@ -549,7 +646,6 @@ class LocalActionDiagrams(PresentationScene):
         self.end_fragment()
 
         self.play(mn.AnimationGroup(*rev_animations))
-        self.end_fragment()
 
         self.play(tree.animate.scale(0.5, about_point=mn.ORIGIN).shift(3*mn.LEFT))
         self.end_fragment()
@@ -563,7 +659,6 @@ class LocalActionDiagrams(PresentationScene):
         self.play(mn.ReplacementTransform(mn.VGroup(lg2, gt), mn.VGroup(gc, ll[2])))
         self.end_fragment()
         self.play(mn.ReplacementTransform(mn.VGroup(lg1, bt), mn.VGroup(bc, ll[3])))
-        self.wait(2)
         self.end_fragment()
 
         lad_grp = mn.VGroup(ld, ll[1], ll[2], ll[3], rc, gc, bc, ll[0])
@@ -1070,3 +1165,76 @@ class ScaleProof(PresentationScene):
         screen_grp = mn.Group(half_tree, swap_new, tree_two-swap_two, tree_three, scale_value, *vert_labels[1:], old_vert_labels[0])
         self.play(mn.FadeOut(screen_grp, shift=mn.UP))
         self.end_fragment()
+
+class ExampleScene(PresentationScene):
+    def construct(self):
+
+        title = mn.Tex("Examples")
+        aut_t3 = mn.MathTex(r"\operatorname{Aut}(T_3)")
+        
+        self.end_fragment()
+        self.add(title)
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(title, aut_t3))
+        self.end_fragment()
+
+        bez_point1 = 2*(mn.UP + 1*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 1*mn.LEFT)
+        curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.RED)
+
+        dot = mn.Dot(mn.ORIGIN, z_index=1)
+        vert_label = mn.MathTex(r"S_3").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        curve_label = mn.MathTex(r"\{1, 2, 3\}").move_to(2*mn.UP).scale(0.75)
+        lad = mn.VGroup(curve, dot, vert_label, curve_label).scale(1.75)
+        lad = lad.shift(-1*lad.get_center())
+
+
+
+        #animations = [
+        #        mn.Create(dot),
+        #        mn.GrowFromPoint(curve, dot.get_center()),
+        #        mn.GrowFromPoint(vert_label, dot.get_center()),
+        #        mn.GrowFromPoint(curve_label, dot.get_center()),
+        #        aut_t3.animate.shift(3*mn.LEFT - 1*mn.UP)
+        #        ]
+
+        self.play(mn.ReplacementTransform(aut_t3, lad))
+        self.end_fragment()
+
+        #equations = mn.MathTex(r"s(g) &= 2", r"\\&= \times_1^2 x \\&= g").shift(2*mn.RIGHT)
+        #for g in equations:
+        #    self.play(mn.Write(g))
+        #self.wait(1)
+        #self.end_fragment()
+
+        self.play(lad.animate.shift(3*mn.LEFT))
+
+        equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_3\right)_{1}\cdot 2\right|\right)^{L/1}",
+                r"\\   &= 2^{L}",
+                ]
+
+        equations = mn.MathTex(*equations)
+        equations.shift(3*mn.RIGHT)
+
+        for eq in equations:
+            self.add(eq)
+            self.end_fragment()
+
+
+        new_vert_label = mn.MathTex(r"S_d").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75).scale(1.75).move_to(vert_label.get_center())
+        new_curve_label = mn.MathTex(r"\{1, 2, \dots, d\}").move_to(2*mn.UP).scale(0.75).scale(1.75).shift(3*mn.LEFT).move_to(curve_label.get_center())
+        new_equations = [
+                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
+                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_d\right)_{1}\cdot 2\right|\right)^{L/1}",
+                r"\\   &= (d-1)^{L}",
+                ]
+        new_equations = mn.MathTex(*new_equations).move_to(equations.get_center() + 0.07*mn.DOWN)
+
+        animations = [mn.ReplacementTransform(g, h) for g, h in zip([vert_label, curve_label, equations], [new_vert_label, new_curve_label, new_equations])]
+
+        self.play(mn.AnimationGroup(*animations))
+        self.end_fragment()
+
+        old_stuff = mn.VGroup(new_vert_label, new_curve_label, new_equations, dot, curve)
