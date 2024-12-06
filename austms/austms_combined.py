@@ -98,13 +98,13 @@ class FullScene(PresentationScene):
         self.remove(*[x for x in self.mobjects if x not in set([title, ul])])
         self.end_fragment()
 
-        scale_def = mn.MathTex(r"s(g) = \min_{U \in \mathrm{CO}(G)}\left|\alpha(U) : \alpha(U) \cap U\right|").next_to(title, mn.DOWN, 1)
+        scale_def = mn.MathTex(r"s(\alpha) = \min_{U \in \mathrm{CO}(G)}\left|\alpha(U) : \alpha(U) \cap U\right|").next_to(title, mn.DOWN, 1)
         para_3, _, _ = create_paragraph("G. Willis showed that $U$ is minimal if and only if it is ", r"tidy", r".")
         para_3.next_to(scale_def, mn.DOWN, 0.5)
         para_3[2].set_color(mn.YELLOW)
         para_4, _, _ = create_paragraph("If $U$ is tidy then it has a decomposition $U = U_{+}U_{-}$ and:")
         para_4.next_to(para_3, mn.DOWN, 1).align_to(para_3, mn.LEFT)
-        scale_def_2 = mn.MathTex(r"s(g) = \left|\alpha(U_+) : U_+\right|").next_to(para_4, mn.DOWN, 0.5)
+        scale_def_2 = mn.MathTex(r"s(\alpha) = \left|\alpha(U_+) : U_+\right|").next_to(para_4, mn.DOWN, 0.5)
 
         self.add(scale_def)
         self.end_fragment()
@@ -1057,7 +1057,7 @@ class FullScene(PresentationScene):
         self.add(title, ul)
         self.end_fragment()
 
-        text1, _, _ = create_paragraph(r"If $g$ is a translation of length $l$ along an axis labelled by colours from sets $(C_i)_{i=0}^{L-1}$ and $(D_i)_{i=0}^{L-1}$ then")
+        text1, _, _ = create_paragraph(r"If $g$ is a translation of length $L$ along an axis labelled by colours from sets $(C_i)_{i=0}^{l-1}$ and $(D_i)_{i=0}^{l-1}$ then")
         text1.next_to(ul, mn.DOWN, buff=1)
         scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}").next_to(text1, mn.DOWN, buff=1.25).scale(1.5)
         scale_value.save_state()
@@ -1386,7 +1386,7 @@ class FullScene(PresentationScene):
         self.end_fragment()
 
         # New Slide (ending)
-        bib_para, _, _ = create_paragraph("blah", r"[1] A. Brehm, M. Gheysens, A. Le Boudec, and R. Rollin, ``The scale function and tidy subgroups,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 145--160 \\{} [2] M. Chijoff and S. Tornier, Discrete (P)-closed Groups Acting On Trees. 2024. [Online]. Available: https://arxiv.org/abs/2409.13240 \\{} [3] C. D. Reid and S. M. Smith, Groups acting on trees with Tits' independence property (P). 2022. [Online]. Available: https://arxiv.org/abs/2002.11766 \\{} [4] A. Garrido, Y. Glasner, and S. Tornier, ``Automorphism groups of trees: generalities and prescribed local actions,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 92--116 \\{} [5] G. Willis, ``The structure of totally disconnected locally compact groups,'' Mathematische Annalen, vol. 300, no. 1, pp. 341--363, Sep. 1994, doi: https://doi.org/10.1007/bf01450491.", 9, font_size=38)
+        bib_para, _, _ = create_paragraph(r"[1] A. Brehm, M. Gheysens, A. Le Boudec, and R. Rollin, ``The scale function and tidy subgroups,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 145--160 \\{} [2] M. Chijoff and S. Tornier, Discrete (P)-closed Groups Acting On Trees. 2024. [Online]. Available: https://arxiv.org/abs/2409.13240 \\{} [3] C. D. Reid and S. M. Smith, Groups acting on trees with Tits' independence property (P). 2022. [Online]. Available: https://arxiv.org/abs/2002.11766 \\{} [4] A. Garrido, Y. Glasner, and S. Tornier, ``Automorphism groups of trees: generalities and prescribed local actions,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 92--116 \\{} [5] G. Willis, ``The structure of totally disconnected locally compact groups,'' Mathematische Annalen, vol. 300, no. 1, pp. 341--363, Sep. 1994, doi: https://doi.org/10.1007/bf01450491.", 9, font_size=38)
 
         bib_para.shift((-1*bib_para.get_top()-7*mn.UP))
         self.add(bib_para)
