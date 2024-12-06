@@ -61,6 +61,10 @@ class IntroText(PresentationScene):
 class ScaleDef(PresentationScene):	
     def construct(self):
         self.end_fragment()
+        tdlc = mn.Tex("Totally Disconnected Locally Compact Groups")
+        self.add(tdlc)
+        self.end_fragment()
+        self.remove(tdlc)
         title = mn.Tex("The Scale Function", font_size=56).move_to(mn.UP*(4-0.75))
         self.add(title, ul := mn.Underline(title))
         self.end_fragment()
@@ -807,7 +811,131 @@ class LocalActionDiagrams(PresentationScene):
         self.play(mn.ShrinkToCenter(whole_scene))
         self.end_fragment()
 
+
+def angle_unit(angle):
+    return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
+
 class TranslationAxes(PresentationScene):
+    def fix_vert(self):
+        verts = mn.VGroup()
+        edges = mn.VGroup()
+        dots = mn.VGroup()
+        verts.add(mn.Dot(mn.ORIGIN), mn.Dot(angle_unit(30)), mn.Dot(angle_unit(150)), mn.Dot(angle_unit(270)))
+        verts.add(mn.Dot(angle_unit(30)+angle_unit(0)), mn.Dot(angle_unit(30)+angle_unit(60)),
+                  mn.Dot(angle_unit(150)+angle_unit(120)), mn.Dot(angle_unit(150)+angle_unit(180)),
+                  mn.Dot(angle_unit(270)+angle_unit(240)), mn.Dot(angle_unit(270)+angle_unit(300)))
+        e_conn = [(0, 1), (0, 2), (0, 3), (1, 4), (1, 5), (2, 6), (2, 7), (3, 8), (3, 9)]
+        for conn in e_conn:
+            edges.add(mn.Line(start=verts[conn[0]].get_center(), end=verts[conn[1]].get_center()))
+
+        for edge in edges[3:]:
+            start = edge.start
+            end = edge.end
+            line_dir = end - start
+            _dots = mn.Text("\u22ef")
+            angle = np.arctan2(line_dir[1], line_dir[0])
+            _dots.rotate(angle + np.pi)
+            buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+            _dots.move_to(end + buffer)
+            dots.add(_dots)
+
+
+        return verts, edges, dots
+
+    def inv_edge(self):
+        verts = mn.VGroup()
+        edges = mn.VGroup()
+        dots = mn.VGroup()
+        verts.add(mn.Dot(mn.LEFT), mn.Dot(mn.RIGHT))
+        verts.add(mn.Dot(mn.LEFT + angle_unit(135)), mn.Dot(mn.LEFT+angle_unit(225)),
+                  mn.Dot(mn.RIGHT + angle_unit(45)), mn.Dot(mn.RIGHT + angle_unit(-45)),
+                  mn.Dot(mn.LEFT + angle_unit(135) + angle_unit(135-30)), mn.Dot(mn.LEFT + angle_unit(135) + angle_unit(135+30)),
+                  mn.Dot(mn.LEFT + angle_unit(225) + angle_unit(225-30)), mn.Dot(mn.LEFT + angle_unit(225) + angle_unit(225+30)),
+                  mn.Dot(mn.RIGHT + angle_unit(45)+angle_unit(45-30)), mn.Dot(mn.RIGHT + angle_unit(45)+angle_unit(45+30)),
+                  mn.Dot(mn.RIGHT + angle_unit(-45)+angle_unit(-45-30)), mn.Dot(mn.RIGHT + angle_unit(-45)+angle_unit(-45+30)))
+        e_conn = [(0, 1), (0, 2), (0, 3), (1, 4), (1, 5), (2, 6), (2, 7), (3, 8), (3, 9), (4, 10), (4, 11), (5, 12), (5, 13)]
+        for conn in e_conn:
+            edges.add(mn.Line(start=verts[conn[0]].get_center(), end=verts[conn[1]].get_center()))
+
+        for edge in edges[5:]:
+            start = edge.start
+            end = edge.end
+            line_dir = end - start
+            _dots = mn.Text("\u22ef")
+            angle = np.arctan2(line_dir[1], line_dir[0])
+            _dots.rotate(angle + np.pi)
+            buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+            _dots.move_to(end + buffer)
+            dots.add(_dots)
+
+
+        return verts, edges, dots
+
+    def trans_axis(self):
+        START_NO = -7
+        vertices = [mn.Dot(mn.LEFT*i*2, z_index=1) for i in range(-1*START_NO + 1, 0, -1)] + [mn.Dot(mn.ORIGIN, z_index=1)] + [mn.Dot(mn.RIGHT*i*2, z_index=1) for i in range(1, -1*START_NO + 2)]
+        edges = [mn.Line(start=d1.get_center(), end=d2.get_center()) for d1, d2 in zip(vertices[:-1], vertices[1:])]
+
+        end_group = mn.VGroup()
+        for v in vertices:
+            end_group.add(v)
+        for e in edges:
+            end_group.add(e)
+
+        branch_vertices = []
+        branch_edges = []
+        ellipses_groups = []
+
+        for vert_no, base_vertex in enumerate(vertices):
+            SCALE_FACTOR = 0.75
+            if vert_no % 2 == 0:
+                direction = 1
+            else:
+                direction = -1
+            vert_2 = []
+
+            vert_2.append(mn.Dot(base_vertex.get_center() + direction*mn.UP))
+            vert_2 += [mn.Dot(vert_2[0].get_center() + direction*SCALE_FACTOR*(mn.RIGHT*np.cos(3*np.pi/4) + mn.UP*np.sin(3*np.pi/4))),
+                        mn.Dot(vert_2[0].get_center() + direction*SCALE_FACTOR*(mn.RIGHT*np.cos(np.pi/4) + mn.UP*np.sin(np.pi/4)))]
+            vert_2 += [mn.Dot(vert_2[1].get_center() + direction*SCALE_FACTOR*mn.LEFT), mn.Dot(vert_2[1].get_center() + direction*SCALE_FACTOR*mn.UP),
+                       mn.Dot(vert_2[2].get_center() + direction*SCALE_FACTOR*mn.RIGHT), mn.Dot(vert_2[2].get_center() + direction*SCALE_FACTOR*mn.UP)]
+
+            edge_2_conn = [(0, 1), (0, 2), (1, 3), (1, 4), (2, 5), (2, 6)]
+            edge_2 = [mn.Line(start=base_vertex.get_center(), end=vert_2[0].get_center())] +\
+                     [mn.Line(start=vert_2[e[0]].get_center(), end=vert_2[e[1]].get_center()) for e in edge_2_conn]
+
+            text_group = mn.VGroup()
+            end_edges = edge_2[3:]
+            for edge in end_edges:
+                dots = mn.Text("\u22ef")
+                edge_dir = edge.end - edge.start
+                angle = np.arctan2(edge_dir[1], edge_dir[0])
+                dots.rotate(angle + np.pi)
+                buffer = SCALE_FACTOR*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+                dots.move_to((edge.end + edge.start)/2 + buffer)
+                text_group.add(dots)
+            branch_vertices.append(vert_2)
+            branch_edges.append(edge_2)
+            ellipses_groups.append(text_group)
+
+        vv = []
+        ee = []
+        tt = []
+
+        for vert, edge, text in zip(branch_vertices, branch_edges, ellipses_groups):
+            vv += vert
+            ee += edge
+            tt += text
+
+
+        tree = mn.VGroup(*vertices, *edges)
+        for bv, be, eg in zip(branch_vertices, branch_edges, ellipses_groups):
+            tree.add(*bv)
+            tree.add(*be)
+            tree.add(*eg)
+
+        return tree
+
     def construct(self):
         title = mn.Tex(r"Translation Axes", font_size=56).move_to(mn.UP*(4-0.75))
         ul = mn.Underline(title)
@@ -815,7 +943,7 @@ class TranslationAxes(PresentationScene):
         self.add(title, ul)
         self.end_fragment()
 
-        text1, _, _ = create_paragraph(r"There are three ways an automorphism can act: fix a vertex, fix an edge, and translate.")
+        text1, _, _ = create_paragraph(r"There are three ways an automorphism can act: fix a vertex, invert an edge, or translate along an axis..\phantom{ttt}")
         text2, _, _ = create_paragraph(r"In a locally finite tree $G_F$ is compact for any finite set $F$.")
         text3, _, _ = create_paragraph(r"This means to find the scale values of a group we need to identify all translations.")
         blist = mn.VGroup(text1, text2, text3)
@@ -823,9 +951,46 @@ class TranslationAxes(PresentationScene):
         blist.next_to(ul, mn.DOWN, buff=1)
         text2.align_to(text1, mn.LEFT)
 
-        for row in blist:
+
+        for i, row in enumerate(blist):
             self.add(row)
             self.end_fragment()
+            #38-47
+            #49-60
+            #64-83
+            if i == 0:
+                fv = mn.VGroup(*self.fix_vert()).scale(0.75).shift(1.5*mn.DOWN)
+                ie = mn.VGroup(*self.inv_edge()).scale(0.75).shift(1.5*mn.DOWN)
+                trans = self.trans_axis()
+                trans.scale(0.75).shift(1.5*mn.DOWN)
+                text1[1][38:48].set_color(mn.YELLOW)
+                self.end_fragment()
+                self.add(fv)
+                self.end_fragment()
+                self.play(mn.Rotate(fv, angle=np.pi/3, about_point=1.5*mn.DOWN))
+                self.end_fragment()
+                self.remove(*fv)
+                text1[1][38:48].set_color(mn.WHITE)
+                text1[1][49:61].set_color(mn.YELLOW)
+                self.end_fragment()
+                self.add(ie)
+                self.end_fragment()
+                self.play(mn.Rotate(ie, angle=np.pi, about_point=mn.ORIGIN, axis=mn.UP))
+                self.end_fragment()
+                text1[1][49:61].set_color(mn.WHITE)
+                text1[1][64:84].set_color(mn.YELLOW)
+                self.remove(*ie)
+                self.end_fragment()
+                self.add(trans)
+                self.end_fragment()
+                self.play(trans.animate.shift(3*mn.RIGHT))
+                self.play(trans.animate.shift(6*mn.LEFT))
+                self.end_fragment()
+                text1[1][64:84].set_color(mn.WHITE)
+                self.remove(*trans)
+                self.end_fragment()
+
+
 
         self.remove(*blist, blist, title, ul)
         self.end_fragment()
@@ -1238,3 +1403,19 @@ class ExampleScene(PresentationScene):
         self.end_fragment()
 
         old_stuff = mn.VGroup(new_vert_label, new_curve_label, new_equations, dot, curve)
+
+        self.play(mn.FadeOut(old_stuff, shift=mn.UP))
+
+
+class Ending(PresentationScene):
+    def construct(self):
+        bib_para, _, _ = create_paragraph("blah", r"[1] A. Brehm, M. Gheysens, A. Le Boudec, and R. Rollin, ``The scale function and tidy subgroups,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 145--160 \\{} [2] M. Chijoff and S. Tornier, Discrete (P)-closed Groups Acting On Trees. 2024. [Online]. Available: https://arxiv.org/abs/2409.13240 \\{} [3] C. D. Reid and S. M. Smith, Groups acting on trees with Tits' independence property (P). 2022. [Online]. Available: https://arxiv.org/abs/2002.11766 \\{} [4] A. Garrido, Y. Glasner, and S. Tornier, ``Automorphism groups of trees: generalities and prescribed local actions,'' in New Directions in Locally Compact Groups, P.-E. Caprace and N. Monod, Eds. Cambridge: Cambridge University Press, 2018, pp. 92--116 \\{} [5] G. Willis, ``The structure of totally disconnected locally compact groups,'' Mathematische Annalen, vol. 300, no. 1, pp. 341--363, Sep. 1994, doi: https://doi.org/10.1007/bf01450491.", 9, font_size=38)
+
+        bib_para.shift((-1*bib_para.get_top()-7*mn.UP))
+        self.add(bib_para)
+        self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=5, rate_fun=mn.rate_functions.linear)
+        self.end_fragment()
+
+        q = mn.Text("?").scale(2.5)
+        self.play(mn.Write(q))
+        self.end_fragment()
