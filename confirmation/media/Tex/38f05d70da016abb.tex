@@ -1,0 +1,30 @@
+\documentclass[preview]{standalone}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\begin{document}
+\begin{center}
+\begin{tikzcd}
+    {\mathcal{C}}
+    \arrow["K"', from=1-1, to=2-1]
+    \arrow[bend left=37, "F" name=U, from=1-1, to=2-2] 
+    \arrow[Rightarrow, "\eta" description, 
+    shorten <=4pt, pos=0.58, from=U, to=2-1] \\
+    {\mathcal{D}}
+    \arrow["\mathrm{Lan}_K F"', ""{name=UU, below},
+    from=2-1, to=2-2] & {\mathcal{E}}  \\
+    {\quad } & {\quad }
+    \arrow[phantom, ""{coordinate,name=Z}, 
+    from=3-1, to=3-2]
+    \arrow["L"', ""{name=DD}, 
+     from=2-1, to= 2-2, 
+     rounded corners,
+    to path={ -- ([yshift=-3ex] \tikztostart.south)
+              |- (Z) [pos=1] \tikztonodes
+              -| ([yshift=-3ex] \tikztotarget.south)
+              -- (\tikztotarget)}] 
+    \arrow ["\chi", Rightarrow,  shorten <=1.5pt,
+    from=UU, to= DD, yshift=-1ex]
+\end{tikzcd}
+\end{center}
+\end{document}
