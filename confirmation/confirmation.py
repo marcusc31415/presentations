@@ -4,18 +4,24 @@ from manim_revealjs import PresentationScene, COMPLETE_LOOP, LOOP
 
 mn.config.video_dir= "./videos"
 
-def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48):  
+def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48, align="justifying"):  
     template = mn.TexTemplate()
     template.add_to_preamble(r"\usepackage{ragged2e}")  
     template.add_to_preamble(r"\setlength\parindent{0pt}")  
     paragraph = mn.VGroup()  
     paragraph_title = mn.Tex(r"\textbf{" + title + r"}",  font_size=25,  color=mn.BLUE,  tex_template=template) 
-    para_start = r"\parbox{" + str(paragraph_width_in_cm) + r"cm}{\noindent{}\justifying{"
+    para_start = r"\parbox{" + str(paragraph_width_in_cm) + "cm}{\\noindent{}\\" + align + "{"
     paragraph_text = mn.Tex(para_start, *text, "}}",  font_size=font_size,  tex_template=template)  
     paragraph = paragraph.add(paragraph_title, paragraph_text)  
     paragraph = paragraph.arrange(mn.DOWN, aligned_edge=mn.LEFT)  
     return paragraph_text, paragraph_title, paragraph
 
+def timeline_event(position, year, text, up_pos=mn.UP):
+    year_mn = mn.Tex(year, font_size=30).move_to(position + 0.5*mn.DOWN)
+    text_mn, _, _ = create_paragraph(text, paragraph_width_in_cm=3, font_size=36, align="centering")
+    text_mn = text_mn.move_to(position + up_pos)
+    line = mn.Line(start=position, end=position + 0.5*mn.UP)
+    return mn.VGroup(line, year_mn, text_mn)
 
 def bez_edge(start, end, color, direction, label=None, label_scale=0.6, shift_label=0.3):
     l_point = start.get_center()
@@ -128,5 +134,60 @@ class IntroScene(PresentationScene):
         self.play(mn.GrowFromCenter(mn.VGroup(arrow_4, pi_g)))
         self.end_fragment()
 
+        self.remove(arrow, arrow_2, aut_g, arrow_3, arrow_4, aut_5, pi_g, *exact_seq)
+        self.end_fragment()
 
+
+class ScaleBackground(PresentationScene):
+    def construct(self):
+        title = mn.Tex("A Brief History of t.d.l.c.\ Groups", font_size=56)
+
+        self.add(title)
+        self.end_fragment()
+
+        self.remove(title)
+        self.end_fragment()
+
+        base_line = mn.Line(start=100*mn.LEFT, end=(158+58)*mn.RIGHT)
+
+        event_1 = timeline_event(mn.ORIGIN, "1936", "van Dantzig's Theorem")
+        event_2 = timeline_event(58*mn.RIGHT, "1994", "G. Willis: Scale Function and Tidy Subgroups", up_pos=1.5*mn.UP)
+        event_3 = timeline_event(64*mn.RIGHT, "2000", "M. Burger and S. Mozes: Universal Group $U(F)$", up_pos=1.5*mn.UP)
+        event_s = timeline_event(-30*mn.RIGHT, "1970", "J. Tits: Property ($P$)", up_pos=1*mn.UP)
+        event_4 = timeline_event(79*mn.RIGHT, "2015", "C. Banks, M. Elder, and G. Willis: Property ($P_k$)", up_pos=1.5*mn.UP)
+        event_5 = timeline_event(81*mn.RIGHT, "2017", "S. Smith: Universal Group $U(F_1, F_2)$", up_pos=3*mn.UP)
+        event_6 = timeline_event(86*mn.RIGHT, "2022", "C. Reid and S. Smith: Local Action Diagrams", up_pos=1.5*mn.UP)
+
+        event_5.add(mn.Line(start=81*mn.RIGHT, end=2.5*mn.UP + 81*mn.RIGHT))
+
+        timeline = mn.VGroup(base_line, event_1, event_2, event_3, event_4, event_5, event_6)
+        
+        self.add(*timeline)
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(58*mn.LEFT))
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(6*mn.LEFT)) # 2000
+        timeline.add(event_s)
+        self.add(event_s)
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(30*mn.RIGHT)) # 1970
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(45*mn.LEFT)) # 2015
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(2*mn.LEFT)) # 2017
+        self.end_fragment()
+        
+        self.play(timeline.animate.shift(5*mn.LEFT)) # 2017
+        self.end_fragment()
+
+        self.play(timeline.animate.shift(28*mn.RIGHT)) # 2017
+        self.end_fragment()
+
+        self.play(timeline.animate.scale(500), run_time=4)
+        self.end_fragment()
 
