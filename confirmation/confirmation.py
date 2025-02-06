@@ -16,9 +16,9 @@ def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48,
     paragraph = paragraph.arrange(mn.DOWN, aligned_edge=mn.LEFT)  
     return paragraph_text, paragraph_title, paragraph
 
-def timeline_event(position, year, text, up_pos=mn.UP):
+def timeline_event(position, year, text, up_pos=mn.UP, para_width=3):
     year_mn = mn.Tex(year, font_size=30).move_to(position + 0.5*mn.DOWN)
-    text_mn, _, _ = create_paragraph(text, paragraph_width_in_cm=3, font_size=36, align="centering")
+    text_mn, _, _ = create_paragraph(text, paragraph_width_in_cm=para_width, font_size=36, align="centering")
     text_mn = text_mn.move_to(position + up_pos)
     line = mn.Line(start=position, end=position + 0.5*mn.UP)
     return mn.VGroup(line, year_mn, text_mn)
@@ -65,30 +65,20 @@ class IntroScene(PresentationScene):
         self.end_fragment()
         self.remove(author, supervise)
 
-        title_2 = mn.Tex("The Scale Function and Local Action Diagrams", font_size=56).shift(mn.UP)
-        title_back = title.copy()
-
-        self.play(mn.ReplacementTransform(title, title_2))
-        title = title_back
-        self.end_fragment()
-        self.play(mn.ReplacementTransform(title_2, title))
-        self.end_fragment()
-
         self.play(mn.FadeOut(title[0], shift=mn.UP), mn.FadeOut(title[1], shift=mn.DOWN), title[2].animate.move_to(mn.UP))
         self.end_fragment()
 
-        fourier = mn.Tex("Haar Measure", r"$\implies$ Integration", r" $\implies$ ", r"Fourier Transforms", font_size=54).shift(mn.DOWN)
+        fourier = mn.Tex(r"Fourier Analysis", font_size=54).shift(mn.DOWN)
 
-        for text in [[0], [1], [2, 3]]:
-            self.add(*[fourier[i] for i in text])
-            self.end_fragment()
+        self.add(fourier)
+        self.end_fragment()
 
-        self.play(mn.ApplyWave(fourier[3]))
+        self.play(mn.ApplyWave(fourier))
         self.end_fragment()
 
         self.remove(*fourier, *title)
 
-        exact_seq = mn.Tex(r"$1 \longrightarrow $", r" $G^{o}$ ", r" $\longrightarrow$ ", r" $G$ ", r" $\longrightarrow$ ", r" $G\backslash G^{o}$ ", r" $\longrightarrow$ ",  r"$1$", font_size=48)
+        exact_seq = mn.Tex(r"$1 \longrightarrow $", r" $G^{o}$ ", r" $\longrightarrow$ ", r" $G$ ", r" $\longrightarrow$ ", r" $G/ G^{o}$ ", r" $\longrightarrow$ ",  r"$1$", font_size=48)
 
         order = [[3], [1, 2], [4, 5], [0, 6, 7]]
 
@@ -101,7 +91,7 @@ class IntroScene(PresentationScene):
         self.play(mn.Indicate(exact_seq[-3]))
         self.end_fragment()
 
-        ex = mn.MathTex(r"(\mathbb{Q}_{p}^{*}, \times)", font_size=56).shift(2*mn.DOWN)
+        ex = mn.MathTex(r"(\mathbb{Q}_{p}^{*}, \times)", font_size=56).next_to(exact_seq[5], mn.DOWN, 0.5)
 
         self.add(ex)
         self.end_fragment()
@@ -111,7 +101,6 @@ class IntroScene(PresentationScene):
         aut_g = mn.MathTex(r"\operatorname{Aut}(\Gamma)").move_to(exact_seq[-1].get_center()).shift(0.7*mn.RIGHT)
 
         self.play(mn.ShrinkToCenter(exact_seq[0]), mn.ReplacementTransform(mn.VGroup(exact_seq[-1]), aut_g))
-        self.end_fragment()
 
         new_text = mn.VGroup(exact_seq[1:-1], aut_g)
         self.play(new_text.animate.move_to(mn.DOWN))
@@ -121,23 +110,23 @@ class IntroScene(PresentationScene):
         arrow = mn.Tex(r"$\longrightarrow$", font_size=48).rotate(-mn.PI/2).next_to(exact_seq[5], mn.UP)
         arrow_2 = mn.DashedLine(start=arrow.get_edge_center(mn.UP) , end=arrow.get_edge_center(mn.DOWN)).next_to(aut_g, mn.UP)
 
-        new_group = mn.MathTex(r"\widetilde{G\backslash G^{o}").next_to(arrow, mn.UP)
+        new_group = mn.MathTex(r"\widetilde{G/ G^{o}").next_to(arrow, mn.UP)
         aut_t = mn.MathTex(r"\operatorname{Aut}(T)").next_to(arrow_2, mn.UP)
         arrow_3 = mn.Tex(r"$\longrightarrow$", font_size=48).next_to(new_group, mn.RIGHT)
         arrow_4 = arrow.copy().next_to(new_group, mn.UP)
 
-        self.play(mn.GrowFromEdge(mn.VGroup(arrow, arrow_2, new_group, aut_t, arrow_3), mn.DOWN))
-        self.end_fragment()
+        #self.play(mn.GrowFromEdge(mn.VGroup(arrow, arrow_2, new_group, aut_t, arrow_3), mn.DOWN))
+        #self.end_fragment()
 
         pi_g = mn.MathTex(r"\pi_1(\Gamma)").next_to(arrow_4, mn.UP)
         
-        self.play(mn.GrowFromCenter(mn.VGroup(arrow_4, pi_g)))
-        self.end_fragment()
+        #self.play(mn.GrowFromCenter(mn.VGroup(arrow_4, pi_g)))
+        #self.end_fragment()
 
         self.remove(arrow, arrow_2, aut_g, arrow_3, arrow_4, aut_g, pi_g, *exact_seq, new_group, aut_t)
         self.end_fragment()
 
-        item1, _, _ = create_paragraph("1: Find scale values of ($P$)-closed Groups.", font_size=48)
+        item1, _, _ = create_paragraph("1: Find scale values of ($P$)-closed groups.", font_size=48)
         item1.shift(2*mn.UP)
         item2, _, _ = create_paragraph("2: Continue development of a GAP package \\\\ \phantom{2: }for local action diagrams.", font_size=48)
         item2.align_to(item1, mn.LEFT).shift(0.5*mn.UP)
@@ -157,29 +146,22 @@ class IntroScene(PresentationScene):
 
 class Background(PresentationScene):
     def construct(self):
-        title = mn.Tex("A Brief History of t.d.l.c.\ Groups", font_size=56)
 
-        self.add(title)
-        self.end_fragment()
-
-        self.remove(title)
-        self.end_fragment()
-
-        base_line = mn.Line(start=100*mn.LEFT, end=(158+58)*mn.RIGHT)
+        base_line = mn.Line(start=100*mn.LEFT, end=(100)*mn.RIGHT)
 
         event_1 = timeline_event(mn.ORIGIN, "1936", "van Dantzig's Theorem")
         event_2 = timeline_event(58*mn.RIGHT, "1994", "G. Willis: Scale Function and Tidy Subgroups", up_pos=1.5*mn.UP)
         event_3 = timeline_event(64*mn.RIGHT, "2000", "M. Burger and S. Mozes: Universal Group $U(F)$", up_pos=1.5*mn.UP)
-        event_s = timeline_event(-30*mn.RIGHT, "1970", "J. Tits: Property ($P$)", up_pos=1*mn.UP)
-        event_4 = timeline_event(79*mn.RIGHT, "2015", "C. Banks, M. Elder, and G. Willis: Property ($P_k$)", up_pos=1.5*mn.UP)
+        event_s = timeline_event(-30*mn.RIGHT, "1970", "J. Tits: Property ($P$)", up_pos=1*mn.UP, para_width=3.5)
+        #event_4 = timeline_event(79*mn.RIGHT, "2015", "C. Banks, M. Elder, and G. Willis: Property ($P_k$)", up_pos=1.5*mn.UP)
         event_5 = timeline_event(81*mn.RIGHT, "2017", "S. Smith: Universal Group $U(F_1, F_2)$", up_pos=3*mn.UP)
         event_6 = timeline_event(86*mn.RIGHT, "2022", "C. Reid and S. Smith: Local Action Diagrams", up_pos=1.5*mn.UP)
 
         event_5.add(mn.Line(start=81*mn.RIGHT, end=2.5*mn.UP + 81*mn.RIGHT))
 
-        timeline = mn.VGroup(base_line, event_1, event_2, event_3, event_4, event_5, event_6)
+        timeline = mn.VGroup(base_line, event_1, event_2, event_3, event_5, event_6)
         
-        self.add(*timeline)
+        self.play(mn.GrowFromCenter(timeline))
         self.end_fragment()
 
         self.play(timeline.animate.shift(58*mn.LEFT))
@@ -193,10 +175,7 @@ class Background(PresentationScene):
         self.play(timeline.animate.shift(30*mn.RIGHT)) # 1970
         self.end_fragment()
 
-        self.play(timeline.animate.shift(45*mn.LEFT)) # 2015
-        self.end_fragment()
-
-        self.play(timeline.animate.shift(2*mn.LEFT)) # 2017
+        self.play(timeline.animate.shift(47*mn.LEFT)) # 2017
         self.end_fragment()
         
         self.play(timeline.animate.shift(5*mn.LEFT)) # 2017
@@ -205,8 +184,8 @@ class Background(PresentationScene):
         self.play(timeline.animate.shift(28*mn.RIGHT)) # Back To Scale
         self.end_fragment()
 
-        self.play(timeline.animate.scale(500), run_time=4)
-        self.end_fragment()
+        #self.play(timeline.animate.scale(500), run_time=4)
+        #self.end_fragment()
 
 class Scale(PresentationScene):
     def construct(self):
@@ -838,148 +817,6 @@ class LocalActionDiagrams(PresentationScene):
         self.remove(lad_edges)
         self.end_fragment()
 
-        ######################
-        #### FINISH HERE? ####
-        ######################
-
-        #labels = [mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3, 4, 5\}")]
-
-        #l_point = 2*mn.LEFT
-        #r_point = 2*mn.RIGHT
-        #new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
-        #new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
-
-        #blue_curve = bez_edge(new_lad_dots[0], new_lad_dots[1], color=mn.BLUE, direction=mn.UP, label=labels[0])
-        #red_curve = bez_edge(new_lad_dots[1], new_lad_dots[0], color=mn.RED, direction=mn.UP, label=labels[1])
-        #new_lad_edges = mn.VGroup(blue_curve, red_curve)
-
-        #for label, dot in zip(new_lad_dot_labels, new_lad_dots):
-        #    label.next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
-
-
-        #animations = [
-        #        mn.ReplacementTransform(ld, new_lad_dots),
-        #        mn.ReplacementTransform(mn.VGroup(ll[1], ll[2], ll[3], lad_edges), new_lad_edges),
-        #        mn.ReplacementTransform(ll[0], new_lad_dot_labels)
-        #        ]
-        #
-        #new_lad = mn.VGroup(new_lad_edges, new_lad_dots, new_lad_dot_labels)       
-
-        #self.play(mn.AnimationGroup(*animations))
-        #self.end_fragment()
-
-        #self.play(new_lad.animate.shift(2.75*mn.UP).scale(0.8))
-        #self.end_fragment()
-
-        #tree_verts = mn.VGroup()
-        #tree_edges = mn.VGroup()
-        #tree_labels = mn.VGroup()
-        #tree_dots = mn.VGroup()
-
-        #def angle_unit(angle):
-        #    return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
-
-        #labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
-
-
-        #tree_verts.add(mn.Dot(mn.ORIGIN, z_index=1))
-        #tree_verts.add(mn.Dot(mn.LEFT, z_index=1), mn.Dot(mn.RIGHT, z_index=1))
-        #tree_verts.add(mn.Dot(mn.LEFT + angle_unit(140), z_index=1), mn.Dot(mn.LEFT + angle_unit(220), z_index=1))
-        #tree_verts.add(mn.Dot(mn.RIGHT + angle_unit(40), z_index=1), mn.Dot(mn.RIGHT + angle_unit(320), z_index=1))
-        #tree_verts.add(mn.Dot(tree_verts[3].get_center() + angle_unit(140), z_index=1), mn.Dot(tree_verts[4].get_center() + angle_unit(220), z_index=1))
-        #tree_verts.add(mn.Dot(tree_verts[5].get_center() + angle_unit(40), z_index=1), mn.Dot(tree_verts[6].get_center() + angle_unit(320), z_index=1))
-
-
-
-        #tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.DOWN, labels[0], label_scale=0.35, shift_label=0.15))  #0
-        #tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.DOWN, labels[1], label_scale=0.35, shift_label=0.15))  #1
-        #tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.DOWN, labels[2], label_scale=0.35, shift_label=0.15))   #2
-        #tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.DOWN, labels[2], label_scale=0.35, shift_label=0.15))   #3
-        #tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, labels[3], label_scale=0.35, shift_label=0.15))     #4
-        #tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, labels[4], label_scale=0.35, shift_label=0.15))     #5
-        #tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.35, shift_label=0.15))    #6
-        #tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.35, shift_label=0.15))    #7
-        #tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.DOWN, labels[3], label_scale=0.35, shift_label=0.15))   #8
-        #tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.DOWN, labels[4], label_scale=0.35, shift_label=0.15))   #9
-        #tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.DOWN, labels[0], label_scale=0.35, shift_label=0.15))  #10
-        #tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.DOWN, labels[0], label_scale=0.35, shift_label=0.15))  #11
-        #tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, labels[1], label_scale=0.35, shift_label=0.15))    #12
-        #tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, labels[2], label_scale=0.35, shift_label=0.15))     #13
-        #tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, labels[1], label_scale=0.35, shift_label=0.15))    #14
-        #tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, labels[2], label_scale=0.35, shift_label=0.15))     #15
-        #tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.DOWN, labels[1], label_scale=0.35, shift_label=0.15))  #16
-        #tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.DOWN, labels[2], label_scale=0.35, shift_label=0.15))   #17
-        #tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.DOWN, labels[1], label_scale=0.35, shift_label=0.15)) #18
-        #tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.DOWN, labels[2], label_scale=0.35, shift_label=0.15))  #19
-
-        #for start, end in zip(tree_verts[3:7], tree_verts[7:11]):
-        #    line_dir = end.get_center() - start.get_center()
-        #    dots = mn.Text("\u22ef")
-        #    angle = np.arctan2(line_dir[1], line_dir[0])
-        #    dots.rotate(angle + np.pi)
-        #    buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
-        #    dots.move_to(end.get_center() + buffer)
-        #    tree_dots.add(dots)
-
-        #whole_tree = mn.VGroup(tree_verts, tree_edges, tree_dots)
-        #whole_tree.scale(1.5)
-
-        ## Creating the tree animation
-        #lad_edge_1 = mn.VGroup(new_lad_edges[0])
-        #lad_edge_2 = mn.VGroup(new_lad_edges[1])
-        #self.play(mn.Indicate(new_lad_dots[0]))
-        #self.end_fragment()
-        #self.play(mn.Create(tree_verts[0]))
-        #self.end_fragment()
-        #self.play(mn.Indicate(lad_edge_1))
-        #self.end_fragment()
-        #self.play(mn.Create(tree_edges[0]), mn.Create(tree_edges[1]), mn.Create(tree_verts[1]), mn.Create(tree_verts[2]))
-        #self.end_fragment()
-        #self.play(mn.Indicate(lad_edge_2))
-        #self.end_fragment()
-        #self.play(mn.Create(tree_edges[2]), mn.Create(tree_edges[3]))
-        #self.end_fragment()
-        #self.play(*[mn.Create(tree_edges[i]) for i in {4, 5, 8, 9}], *[mn.Create(tree_verts[i]) for i in range (3, 7)])
-        #self.end_fragment()
-        #self.play(mn.Indicate(lad_edge_1))
-        #self.end_fragment()
-        #self.play(*[mn.Create(tree_edges[i]) for i in {6, 7, 10, 11}])
-        #self.end_fragment()
-        #self.play(*[mn.Create(tree_edges[i]) for i in range(12, 20)], *[mn.Create(tree_verts[i]) for i in range(7, 11)], *[mn.Write(d) for d in tree_dots])
-        #self.end_fragment()
-
-        ## Coloured path
-        #col_path_grp = mn.VGroup(tree_edges[0], tree_edges[4], tree_edges[12])
-
-        #col_path_grp_scale = col_path_grp.copy().scale(1.2).set_color(mn.YELLOW)
-        #col_path_grp_color = col_path_grp.copy().set_color(mn.YELLOW)
-
-        ##self.play(col_path_grp.animate.set_color(mn.YELLOW))
-        #col_path_grp.save_state()
-        #self.play(mn.Transform(col_path_grp, col_path_grp_scale), run_time=0.5)
-        #self.play(mn.Transform(col_path_grp, col_path_grp_color), run_time=0.5)
-        #self.end_fragment()
-
-        #self.play(mn.Indicate(tree_verts[7]))
-        #self.end_fragment()
-
-        #self.play(mn.Restore(col_path_grp))
-        #self.end_fragment()
-
-        ## Show aut
-        #self.play(mn.Indicate(tree_verts[0]), mn.Indicate(tree_edges[0]), mn.Indicate(tree_edges[1]))
-        #self.end_fragment()
-        #self.play(mn.Indicate(new_lad_dot_labels[0]))
-        #self.end_fragment()
-
-
-        #self.play(mn.Rotate(whole_tree, angle=-np.pi, about_point=mn.ORIGIN))
-        #self.end_fragment()
-
-        #whole_scene = mn.Group(*[obj for obj in self.mobjects])
-
-        #self.play(mn.ShrinkToCenter(whole_scene))
-        #self.end_fragment()
 
 ############################
 ### Remove timeline here ###
@@ -1117,8 +954,8 @@ class TranslationAxes(PresentationScene):
         self.add(title, ul)
         self.end_fragment()
 
-        text1, _, _ = create_paragraph(r"There are three ways an automorphism can act: fix a vertex, invert an edge, or translate along an axis..\phantom{ttt}")
-        text2, _, _ = create_paragraph(r"In a locally finite tree $G_F$ is compact for any finite set $F$.")
+        text1, _, _ = create_paragraph(r"There are three ways an automorphism can act on a tree: fix a vertex, invert an edge, or translate along an axis..\phantom{ttt}")
+        text2, _, _ = create_paragraph(r"In the first two cases it's fairly easy to show that the automorphism has scale 1.")
         text3, _, _ = create_paragraph(r"This means to find the scale values of a group we need to identify all translations.")
         blist = mn.VGroup(text1, text2, text3)
         blist.arrange(mn.DOWN, buff=0.75)
@@ -1294,19 +1131,24 @@ class ScaleProof(PresentationScene):
         tree = mn.VGroup(*edges, *verts)
         tree.shift(0.75*mn.DOWN).scale(1.25)
 
+        cv = verts[5]
+
+        for i in range(1, 5):
+            edges.append(mn.DashedLine(start=cv.get_center(), end=cv.get_center() + 3*np.array([np.cos(-2*np.pi/3 -np.pi/6 + i*np.pi/10), np.sin(-2*np.pi/3 - np.pi/6 + i*np.pi/10), 0]), z_index=0))
+
+
         self.play(*[mn.GrowFromPoint(v, mn.ORIGIN) for v in verts], *[mn.GrowFromPoint(e, mn.ORIGIN) for e in edges])
         self.end_fragment()
 
 
         # Vertex formula colour
-        transform_colour(self, vert_str, mn.ORANGE)
+        transform_colour(self, vert_str, mn.PINK)
         self.end_fragment()
         
-        cv = verts[5]
 
         cv.save_state()
-        cvscale = cv.copy().scale(1.2).set_color(mn.ORANGE)
-        cvcolour = cv.copy().set_color(mn.ORANGE)
+        cvscale = cv.copy().scale(1.2).set_color(mn.PINK)
+        cvcolour = cv.copy().set_color(mn.PINK)
         self.play(mn.Transform(cv, cvscale), run_time=0.5)
         self.play(mn.Transform(cv, cvcolour), run_time=0.5)
         self.end_fragment()
@@ -1345,239 +1187,7 @@ class ScaleProof(PresentationScene):
         self.end_fragment()
 
 
-        ######################
-        # Tree Visualisation #
-        ######################
 
-
-        left_verts = [mn.Dot(i*mn.LEFT, z_index=1) for i in range(0, 10)]
-
-        left_edges = []
-
-        for v1, v2, in zip(left_verts[:-1], left_verts[1:]):
-            left_edges.append(mn.Line(v1.get_center(), v2.get_center()))
-
-        base_tree_verts = mn.VGroup(*left_verts)
-        base_tree_edges = mn.VGroup(*left_edges)
-
-
-        def create_branch(base, rotation=-1*np.pi/3, copy_branch=None, test=None):
-            if copy_branch is None:
-                base_v = base_tree_verts
-                base_e = base_tree_edges
-            else:
-                base_v = base_tree_verts
-                base_e = base_tree_edges
-                #base_v = copy_branch[0]
-                #base_e = copy_branch[1]
-            if test is None:
-                fb_v = base_v.copy().shift(base).rotate(rotation, about_point=base)
-                fb_e = base_e.copy().shift(base).rotate(rotation, about_point=base)
-            else:
-                fb_v = base_v.copy().shift(base)
-                fb_e = base_e.copy().shift(base)
-            return [fb_v, fb_e, base]
-
-        branches = []
-
-        branches.append(create_branch(3*mn.LEFT)) # 18
-        branches.append(create_branch(6*mn.LEFT)) # 36
-        branches.append(create_branch(9*mn.LEFT)) # 54
-        branches.append(create_branch(branches[0][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 72
-        branches.append(create_branch(branches[1][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 90
-        branches.append(create_branch(branches[2][0][3].get_center(), rotation=-np.pi/3 -np.pi/3, copy_branch=branches[0])) # 108
-
-
-        half_tree = mn.VGroup(*left_verts, *left_edges)
-        for b in branches:
-            half_tree.add(*b[0], *b[1])
-
-        tree_two = half_tree.copy() #[8] is last vertex. 
-        tree_two.shift(9*mn.RIGHT)
-
-        tree_three = tree_two.copy().shift(9*mn.RIGHT)
-        whole_tree = mn.VGroup(half_tree, tree_two, tree_three).shift(mn.UP)
-
-        self.play(mn.FadeIn(whole_tree, shift=mn.UP))
-        self.end_fragment()
-
-        self.play(whole_tree.animate.shift(6*mn.LEFT))
-        self.end_fragment()
-        self.play(whole_tree.animate.shift(-6*mn.LEFT))
-        self.end_fragment()
-
-        old_vert_labels = []
-        old_vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$gx_{{{0}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$g^2x_{{{0}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$g^3x_{{{0}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$g^{-1}x_{{{0}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        old_vert_labels.append(mn.Tex(f"$g^{-2}x_{{{0}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-
-        vert_labels = []
-        vert_labels.append(mn.Tex(f"$x_{{{0}}}$").move_to(mn.UP -0.4*mn.UP).scale(0.75))
-        vert_labels.append(mn.Tex(f"$x_{{{1}}}$").move_to(3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        vert_labels.append(mn.Tex(f"$x_{{{2}}}$").move_to(6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        vert_labels.append(mn.Tex(f"$x_{{{3}}}$").move_to(9*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        vert_labels.append(mn.Tex(f"$x_{{{-1}}}$").move_to(-3*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-        vert_labels.append(mn.Tex(f"$x_{{{-2}}}$").move_to(-6*mn.RIGHT + mn.UP -0.4*mn.UP).scale(0.75))
-
-
-        self.play(*[mn.Write(v) for v in old_vert_labels])
-        self.end_fragment()
-
-        self.play(*[mn.ReplacementTransform(i, j) for i, j in zip(old_vert_labels[1:], vert_labels[1:])])
-        self.end_fragment()
-
-        u_plus_para, _, _ = create_paragraph(r"Applying the tidying procedure to $G_{x_0}$ gives us the subgroup\phantom{blah}", font_size=42)
-        u_plus_para = u_plus_para.shift(0.5*mn.DOWN)
-        u_text = mn.MathTex(r"U =  G_{x_0, x_1}").shift(1.75*mn.DOWN).scale(1.5)
-        u_plus_after, _, _ = create_paragraph(r"We can show that $U$ is tidy for $g$ and that", font_size=42)
-        u_plus_after = u_plus_after.shift(1.25*mn.DOWN)
-        u_plus_text = mn.MathTex(r"U_+ =  G_{x_0, x_1, x_2, \dots}").shift(2.75*mn.DOWN).scale(1.5)
-
-        #self.add(u_plus_para)
-        #self.end_fragment()
-        #self.add(u_text)
-        #grp = mn.VGroup(u_plus_para, u_text)
-        #self.end_fragment()
-
-        #self.play(mn.AnimationGroup(grp.animate.shift(1.25*mn.UP), mn.FadeOut(u_plus_para, shift=1.25*mn.UP)))
-        #self.add(u_plus_after)
-        #self.end_fragment()
-        #self.add(u_plus_text)
-        #self.end_fragment()
-
-        indicate_ray = mn.VGroup(half_tree[0], tree_two[0:19], tree_three[0:19])
-        indicate_ray_two = mn.VGroup(tree_two[0:7] + tree_two[10:16], tree_three[0:19])
-
-        self.play(indicate_ray.animate.set_color(mn.YELLOW))
-        self.end_fragment()
-        scale_text = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : G_{x_0, x_1, x_2, \dots}\right|").move_to(u_plus_after.get_center())
-        text_grp = mn.VGroup(u_text, u_plus_after, u_plus_text)
-        #self.play(mn.FadeOut(text_grp, shift=mn.RIGHT))
-        #self.end_fragment()
-        #self.add(scale_text)
-        #self.end_fragment()
-        self.play(indicate_ray_two.animate.set_color(mn.GREEN))
-        self.end_fragment()
-
-        #nt = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} : \left(G_{x_1, x_2, x_3, \dots}\right)_{x_0} \right|").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
-        #os = mn.MathTex(r"s(g) = \left|gU_+g^{-1} : U_+\right| = ", r"\left|G_{x_1, x_2, x_3, \dots} \cdot x_0\right|", r"= 2", r"= 2 \times 1 \times 1").move_to(scale_text.get_center()).align_to(scale_text, direction=mn.LEFT)
-        ##nt.next_to(scale_text[1], direction=mn.LEFT)
-
-        ##self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt, shift=mn.UP))
-        #self.play(mn.FadeOut(scale_text[1], shift=mn.UP), mn.FadeIn(nt[1], shift=mn.UP))
-        #self.end_fragment()
-        #self.play(mn.FadeOut(nt[1], shift=mn.UP), mn.FadeIn(os[1], shift=mn.UP))
-        #self.end_fragment()
-
-        #self.play(mn.Indicate(half_tree[0], color=mn.RED), mn.Indicate(tree_two[9], color=mn.RED), mn.Indicate(old_vert_labels[0], color=mn.RED))
-        #self.end_fragment()
-
-        swap_one = mn.VGroup(half_tree, tree_two[7:10], tree_two[16:19], tree_two[54:72], tree_two[108:])
-        swap_two = mn.VGroup(tree_two[54-18:72-18], tree_two[90:108])
-
-        swap_new = swap_one.copy().rotate(angle=-np.pi/3, about_point=3*mn.RIGHT + mn.UP).set_color(mn.WHITE)
-
-        self.add(swap_new)
-        swap_two.set_opacity(0)
-
-
-        self.play(mn.Rotate(swap_one, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
-                  mn.Rotate(swap_new, angle=np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP),
-                  *[mn.Rotate(vl, angle=-np.pi/3, axis=np.array([0, 0, 1]), about_point=3*mn.RIGHT + mn.UP) for vl in [old_vert_labels[0], vert_labels[4], vert_labels[5]]])
-        self.end_fragment()
-
-
-        #self.play(mn.FadeIn(os[2], shift=mn.UP))
-        #self.end_fragment()
-        #self.play(mn.FadeIn(os[3], shift=mn.UP))
-        #self.end_fragment()
-
-        #scale_value = mn.MathTex(r"s(g) = \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}").move_to(mn.ORIGIN + mn.UP*os.get_center()[1]).scale(1.25)
-        #
-        #self.play(mn.FadeOut(os, shift=mn.UP), mn.FadeOut(scale_text[0], shift=mn.UP), mn.FadeIn(scale_value, shift=mn.UP))
-        #self.end_fragment()
-
-        screen_grp = mn.Group(half_tree, swap_new, tree_two-swap_two, tree_three, *vert_labels[1:], old_vert_labels[0])
-        self.play(mn.FadeOut(screen_grp, shift=mn.UP))
-        self.end_fragment()
-
-class ExampleScene(PresentationScene):
-    def construct(self):
-
-        title = mn.Tex("Example")
-        aut_t3 = mn.MathTex(r"\operatorname{Aut}(T_3)")
-        
-        self.end_fragment()
-        self.add(title)
-        self.end_fragment()
-        self.play(mn.ReplacementTransform(title, aut_t3))
-        self.end_fragment()
-
-        bez_point1 = 2*(mn.UP + 1*mn.RIGHT)
-        bez_point2 = 2*(mn.UP + 1*mn.LEFT)
-        curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.RED)
-
-        dot = mn.Dot(mn.ORIGIN, z_index=1)
-        vert_label = mn.MathTex(r"S_3").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
-        curve_label = mn.MathTex(r"\{1, 2, 3\}").move_to(2*mn.UP).scale(0.75)
-        lad = mn.VGroup(curve, dot, vert_label, curve_label).scale(1.75)
-        lad = lad.shift(-1*lad.get_center())
-
-
-
-        #animations = [
-        #        mn.Create(dot),
-        #        mn.GrowFromPoint(curve, dot.get_center()),
-        #        mn.GrowFromPoint(vert_label, dot.get_center()),
-        #        mn.GrowFromPoint(curve_label, dot.get_center()),
-        #        aut_t3.animate.shift(3*mn.LEFT - 1*mn.UP)
-        #        ]
-
-        self.play(mn.ReplacementTransform(aut_t3, lad))
-        self.end_fragment()
-
-        #equations = mn.MathTex(r"s(g) &= 2", r"\\&= \times_1^2 x \\&= g").shift(2*mn.RIGHT)
-        #for g in equations:
-        #    self.play(mn.Write(g))
-        #self.wait(1)
-        #self.end_fragment()
-
-        self.play(lad.animate.shift(3*mn.LEFT))
-
-        equations = [
-                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
-                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_3\right)_{1}\cdot 2\right|\right)^{L/1}",
-                r"\\   &= 2^{L}",
-                ]
-
-        equations = mn.MathTex(*equations)
-        equations.shift(3*mn.RIGHT)
-
-        for eq in equations:
-            self.add(eq)
-            self.end_fragment()
-
-
-        new_vert_label = mn.MathTex(r"S_d").next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75).scale(1.75).move_to(vert_label.get_center())
-        new_curve_label = mn.MathTex(r"\{1, 2, \dots, d\}").move_to(2*mn.UP).scale(0.75).scale(1.75).shift(3*mn.LEFT).move_to(curve_label.get_center())
-        new_equations = [
-                r"s(g) &= \left(\prod_{i=1}^{l}\left|G(o(a_i))_{c_i}\cdot d_{i-1}\right|\right)^{L/l}",
-                r"\\   &= \left(\prod_{i=1}^{1}\left|\left(S_d\right)_{1}\cdot 2\right|\right)^{L/1}",
-                r"\\   &= (d-1)^{L}",
-                ]
-        new_equations = mn.MathTex(*new_equations).move_to(equations.get_center() + 0.07*mn.DOWN)
-
-        animations = [mn.ReplacementTransform(g, h) for g, h in zip([vert_label, curve_label, equations], [new_vert_label, new_curve_label, new_equations])]
-
-        self.play(mn.AnimationGroup(*animations))
-        self.end_fragment()
-
-        old_stuff = mn.VGroup(new_vert_label, new_curve_label, new_equations, dot, curve)
-
-        self.play(mn.FadeOut(old_stuff, shift=mn.UP))
 
 class GAPPackage(PresentationScene):
     def construct(self):
@@ -1658,40 +1268,11 @@ class GAPPackage(PresentationScene):
 class VTGraphs(PresentationScene):
     def construct(self):
         title = mn.Tex("Constructing Vertex-transitive Graphs \\\\ From Link Graphs", font_size = 64)
-        why = mn.Tex("Why?", font_size = 64)
 
         self.add(title)
         self.end_fragment()
+        self.remove(title)
 
-        self.play(mn.ReplacementTransform(title, why))
-        self.end_fragment()
-
-        title = mn.Tex("Link Graphs", font_size=56).move_to(mn.UP*(4-0.75))
-
-        para1, _, _ = create_paragraph("A graph is a \\textbf{link graph} if it is the only neighbourhood in another graph.")
-        para2, _, _ = create_paragraph("Every vertex-transitive graph has constant links.")
-        para3, _, _ = create_paragraph("But \\textbf{not} every constant link graph is vertex-transitive.")
-
-        para1.next_to(title, mn.DOWN, 1)
-        para2.next_to(para1, mn.DOWN, 1)
-        para3.next_to(para2, mn.DOWN, 1)
-
-        mn.VGroup(para1, para2, para3).arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=0.75)
-
-        self.remove(why)
-
-        self.add(title, ul := mn.Underline(title))
-        self.end_fragment()
-
-        self.add(para1)
-        self.end_fragment()
-        self.add(para2)
-        self.end_fragment()
-        self.add(para3)
-        self.end_fragment()
-
-        self.remove(para1, para2, para3)
-        
         graph_1 = mn.VGroup()
 
 
@@ -1795,6 +1376,48 @@ class VTGraphs(PresentationScene):
 
 
 
+        title = mn.Tex("Link Graphs", font_size=56).move_to(mn.UP*(4-0.75))
+
+        para1, _, _ = create_paragraph("A graph is a \\textbf{link graph} if it is the only neighbourhood in another graph.")
+        para2, _, _ = create_paragraph("Every vertex-transitive graph has constant links.")
+        para3, _, _ = create_paragraph("But \\textbf{not} every constant link graph is vertex-transitive.")
+
+        para1.next_to(title, mn.DOWN, 1)
+        para2.next_to(para1, mn.DOWN, 1)
+        para3.next_to(para2, mn.DOWN, 1)
+
+        mn.VGroup(para1, para2, para3).arrange(mn.DOWN, aligned_edge=mn.LEFT, buff=0.75)
+
+        self.remove(title)
+
+        self.add(title, ul := mn.Underline(title))
+        self.end_fragment()
+
+        self.add(para1)
+        self.end_fragment()
+    
+        ex = graph_2.copy()
+        ex.shift(4*mn.RIGHT + mn.DOWN)
+
+        link_1 = mn.VGroup(*[mn.Dot(mn.RIGHT*i) for i in range(-1, 2)]).shift(4*mn.LEFT + mn.DOWN)
+
+        self.add(link_1)
+        self.add(ex)
+        self.end_fragment()
+
+        self.remove(*link_1, *ex)
+
+
+        self.add(para2)
+        self.end_fragment()
+        self.add(para3)
+        self.end_fragment()
+
+        self.remove(para1, para2, para3)
+        
+
+
+
         self.add(*graph_2)
         self.end_fragment()
         self.play(mn.ReplacementTransform(graph_2, graph_1))
@@ -1808,7 +1431,7 @@ class VTGraphs(PresentationScene):
 
         wwh = mn.Tex("We currently have:", font_size=48).next_to(goal, mn.DOWN, 1).align_to(goal, mn.LEFT)
 
-        i1 = "Theoretical results of A. Joshi and B. Alspach."
+        i1 = "Unpublished theoretical results of A. Joshi and B. Alspach."
         i2 = "Algorithm to search for an extension."
 
         bl = mn.BulletedList(i1, i2, height=1.5, width=10).next_to(wwh, mn.DOWN, 0.5).align_to(goal, mn.LEFT).shift(0.5*mn.RIGHT)
@@ -1851,90 +1474,134 @@ class FutureWork(PresentationScene):
 
         self.remove(title_)
 
-        text_2025 = mn.Tex("2025:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
+#        text_2025 = mn.Tex("2025:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
+#
+#
+#        items_2025 = ["Give a nice compliment to the confirmation panel.", 
+#                 "Write up scale article.",
+#                 "Review existing codebase for GAP package.",
+#                 "Implement function to find scale values.",
+#                 "Improve existing isomorphism and enumeration functions.",
+#                 "Run enumeration function on HPC.",
+#                 "Document and submit for peer review.",
+#                 "Learn more advanced graph theory."]
+#        times_2025 = ["\\textcolor{cyan}{Feb}:", 
+#                "\\textcolor{cyan}{Feb}:", 
+#                "\\textcolor{yellow}{March}:",
+#                "\\textcolor{yellow}{March - April}:",
+#                "\\textcolor{yellow}{April - June}:",
+#                "\\textcolor{yellow}{July}:",
+#                "\\textcolor{yellow}{July - September}:",
+#                "\\textcolor{orange}{October - December}:"]
+#
+#
+#        test = mn.TexTemplate()
+#
+#        test.add_to_preamble(r"\usepackage{xcolor}")
+#
+#        lst_2025 = mn.BulletedList(*[x + " " + y for x, y in zip(times_2025, items_2025)], height=2, width=10, tex_template=test).next_to(text_2025, mn.DOWN, 0.5).align_to(text_2025, mn.LEFT).shift(0.5*mn.RIGHT)
+#
+#        text_2026 = mn.Tex("2026:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
+#        text_2027 = mn.Tex("2027:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
+#
+#
+#        items_2026 = ["Review existing results.", 
+#                 "Find more theoretical results.",
+#                 "Improve existing code and run on HPC.",
+#                 "Implement PatternBost.",
+#                 "Write thesis..."]
+#        times_2026 = ["\\textcolor{orange}{Jan - Feb}:", 
+#                "\\textcolor{orange}{March - July}:", 
+#                "\\textcolor{orange}{March - July}:",
+#                "\\textcolor{orange}{August - September}:",
+#                "\\textcolor{lime}{October - December}:"]
+#
+#
+#        test = mn.TexTemplate()
+#
+#        test.add_to_preamble(r"\usepackage{xcolor}")
+#
+#        lst_2026 = mn.BulletedList(*[x + " " + y for x, y in zip(times_2026, items_2026)], height=2, width=10, tex_template=test).next_to(text_2026, mn.DOWN, 0.5).align_to(text_2026, mn.LEFT).shift(0.5*mn.RIGHT)
+#
+#        items_2027 = ["Extra time!", 
+#                 "Extension projects?",
+#                 "Other work was delayed?"]
+#        times_2027 = ["", 
+#                "", 
+#                ""]
+#
+#
+#        lst_2027 = mn.BulletedList(*[x + "" + y for x, y in zip(times_2027, items_2027)], height=2, width=10, tex_template=test).next_to(text_2027, mn.DOWN, 0.5).align_to(text_2027, mn.LEFT).shift(0.5*mn.RIGHT)
+#
+#        self.add(text_2025)
+#        self.end_fragment()
+#
+#        for row in lst_2025:
+#            self.add(row)
+#            self.end_fragment()
+#
+#        self.remove(*lst_2025, text_2025)
+#        self.add(text_2026)
+#        self.end_fragment()
+#
+#        for row in lst_2026:
+#            self.add(row)
+#            self.end_fragment()
+#
+#        self.remove(*lst_2026, text_2026)
+#        self.add(text_2027)
+#        self.end_fragment()
+#
+#        for row in lst_2027:
+#            self.add(row)
+#            self.end_fragment()
+#
+#        self.remove(*self.mobjects)
+#
+#        self.end_fragment()
+        
+        gantt = mn.ImageMobject('gantt_chart.png').scale(0.85)
 
-
-        items_2025 = ["Give a nice compliment to the confirmation panel.", 
-                 "Write up scale article.",
-                 "Review existing codebase for GAP package.",
-                 "Implement function to find scale values.",
-                 "Improve existing isomorphism and enumeration functions.",
-                 "Run enumeration function on HPC.",
-                 "Document and submit for peer review.",
-                 "Learn more advanced graph theory."]
-        times_2025 = ["\\textcolor{cyan}{Feb}:", 
-                "\\textcolor{cyan}{Feb}:", 
-                "\\textcolor{yellow}{March}:",
-                "\\textcolor{yellow}{March - April}:",
-                "\\textcolor{yellow}{April - June}:",
-                "\\textcolor{yellow}{July}:",
-                "\\textcolor{yellow}{July - September}:",
-                "\\textcolor{orange}{October - December}:"]
-
-
-        test = mn.TexTemplate()
-
-        test.add_to_preamble(r"\usepackage{xcolor}")
-
-        lst_2025 = mn.BulletedList(*[x + " " + y for x, y in zip(times_2025, items_2025)], height=2, width=10, tex_template=test).next_to(text_2025, mn.DOWN, 0.5).align_to(text_2025, mn.LEFT).shift(0.5*mn.RIGHT)
-
-        text_2026 = mn.Tex("2026:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
-        text_2027 = mn.Tex("2027:").move_to(3.25*mn.UP + 4.25*mn.LEFT)
-
-
-        items_2026 = ["Review existing results.", 
-                 "Find more theoretical results.",
-                 "Improve existing code and run on HPC.",
-                 "Implement PatternBost.",
-                 "Write thesis..."]
-        times_2026 = ["\\textcolor{orange}{Jan - Feb}:", 
-                "\\textcolor{orange}{March - July}:", 
-                "\\textcolor{orange}{March - July}:",
-                "\\textcolor{orange}{August - September}:",
-                "\\textcolor{lime}{October - December}:"]
-
-
-        test = mn.TexTemplate()
-
-        test.add_to_preamble(r"\usepackage{xcolor}")
-
-        lst_2026 = mn.BulletedList(*[x + " " + y for x, y in zip(times_2026, items_2026)], height=2, width=10, tex_template=test).next_to(text_2026, mn.DOWN, 0.5).align_to(text_2026, mn.LEFT).shift(0.5*mn.RIGHT)
-
-        items_2027 = ["Extra time!", 
-                 "Extension projects?",
-                 "Other work was delayed?"]
-        times_2027 = ["", 
-                "", 
-                ""]
-
-
-        lst_2027 = mn.BulletedList(*[x + "" + y for x, y in zip(times_2027, items_2027)], height=2, width=10, tex_template=test).next_to(text_2027, mn.DOWN, 0.5).align_to(text_2027, mn.LEFT).shift(0.5*mn.RIGHT)
-
-        self.add(text_2025)
+        self.add(gantt)
+        self.wait(2)
         self.end_fragment()
 
-        for row in lst_2025:
-            self.add(row)
-            self.end_fragment()
+class Ending(PresentationScene):
+    def construct(self):
+        bib_para, _, _ = create_paragraph("blah", r'''
+Morton Brown and Robert Connelly, On graphs with a constant link, New Directions in the Theory of Graphs, Academic Press, 1973.
 
-        self.remove(*lst_2025, text_2025)
-        self.add(text_2026)
+M. Burger and S. Mozes, Groups acting on trees: from local to global structure, Publications Mathématiques de l’IHÉS 92 (2000), no. 1, 113–150.
+
+François Charton, Jordan S. Ellenberg, Adam Zsolt Wagner, and Geordie Williamson, Patternboost: Constructions in mathematics with a little help from ai, 2024.
+
+Marcus Chijoff, Writing a GAP package for local action diagrams, 2023.
+
+Marcus Chijoff and Stephan Tornier, Discrete (p)-closed groups acting on trees, 2024.
+
+The GAP Group, GAP – Groups, Algorithms, and Programming, Ver- sion 4.8.7, 2017.
+
+Yitzhak Katznelson, An introduction to harmonic analysis, Cambridge University Press, 1976.
+
+B. Krön and R. Möller, Analogues of Cayley graphs for topological groups, Mathematische Zeitschrift 258 (2008), no. 3, 637.
+
+Colin D. Reid and Simon M. Smith, Groups acting on trees with tits’ independence property (p), 2022.
+
+J.-P. Serre, Trees, Springer, 1980.
+
+S. Smith, A product for permutation groups and topological groups, Duke Mathematical Journal 166 (2017), no. 15, 2965–2999.
+
+J. Tits, Sur le groupe des automorphismes d’un arbre, Essays on topology and related topics, Springer, 1970, pp. 188–211.
+
+D. Van Dantzig, Zur topologischen Algebra. III. Brouwersche und Can- torsche Gruppen, Compositio Mathematica 3 (1936), 408–426 (de).  
+
+George A Willis, The structure of totally disconnected locally compact groups, Mathematische Annalen 300 (1994), no. 1, 341–363.
+''', 9, font_size=38)
+
+        bib_para.shift((-1*bib_para.get_top()-7*mn.UP))
+        self.add(bib_para)
+        self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=5, rate_fun=mn.rate_functions.linear)
+
+        q = mn.Text("?").scale(2.5)
+        self.play(mn.Write(q))
         self.end_fragment()
-
-        for row in lst_2026:
-            self.add(row)
-            self.end_fragment()
-
-        self.remove(*lst_2026, text_2026)
-        self.add(text_2027)
-        self.end_fragment()
-
-        for row in lst_2027:
-            self.add(row)
-            self.end_fragment()
-
-        self.remove(*self.mobjects)
-
-        self.end_fragment()
-
-### REFERENCES ###
