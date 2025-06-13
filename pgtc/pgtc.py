@@ -880,41 +880,158 @@ class GroupTypes(PresentationScene):
         self.play(mn.FadeOut(flow, shift=mn.DOWN))
         self.end_fragment()
 
+class LinealProof(PresentationScene):
+    def construct(self):
+
+        # Lineal LAD Example
+
+        verts = [mn.Dot(mn.LEFT + mn.DOWN, z_index=1, color=mn.WHITE), mn.Dot(mn.LEFT + mn.UP, z_index=1), mn.Dot(mn.RIGHT + mn.UP, z_index=1, color=mn.WHITE), mn.Dot(mn.RIGHT + mn.DOWN, z_index=1)]
+        edges = []
+
+        labels = [mn.MathTex(r"\{1\}"), mn.MathTex(r"\{2\}"), mn.MathTex(r"\{3, 4\}")]
+
+        def _bez_edge(start, end, color, direction, label=None):
+            l_point = start.get_center()
+            r_point = end.get_center()
+            scale = np.sqrt((r_point[1]-l_point[1])**2 + (r_point[0]-l_point[0])**2)
+            l_point = start.get_center()
+            r_point = scale*mn.RIGHT + start.get_center()
+            bez_point1 = scale*(0.25*direction + 0.25*mn.RIGHT) + l_point
+            bez_point2 = scale*(0.25*direction + 0.25*mn.LEFT) + r_point # Maybe? 
+            curve = mn.CubicBezier(l_point, bez_point1, bez_point2, r_point, color=color)
+            if label is not None:
+                label = labels[label].copy().move_to(curve.point_from_proportion(0.5)).shift(0.3*direction).scale(0.6)
+            if end.get_center()[0] < start.get_center()[0]:
+                if label is not None:
+                    label = label.rotate(np.pi)
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            else:
+                tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
+            if label is not None:
+                grp = mn.VGroup(curve, label, tip)
+            else:
+                grp = mn.VGroup(curve, tip)
+            grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
+            return grp
+
+        for i, j in zip(range(0, 4), range(1, 5)):
+            v1 = verts[(i % 4)]
+            v2 = verts[(j % 4)]
+            if i % 2 == 0:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, label=labels[0]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, label=labels[1]))
+            else:
+                edges.append(bez_edge(v1, v2, mn.BLUE, mn.UP, label=labels[0]))
+                edges.append(bez_edge(v2, v1, mn.RED, mn.UP, label=labels[1]))
+
+        last_vert = mn.Dot(mn.LEFT + mn.DOWN + 2*mn.RIGHT*np.cos(np.pi*5/4) + 2*mn.UP*np.sin(np.pi*5/4), z_index=1)
+
+        e1 = bez_edge(last_vert, verts[0], mn.BLUE, mn.UP, label=labels[1])
+        e2 = bez_edge(verts[0], last_vert, mn.GREEN, mn.UP, label=labels[2])
+
+        verts.append(last_vert)
+        edges = edges + [e1, e2]
+
+        lineal_lad = mn.VGroup(*verts, *edges).scale(1.25)
+
+        ll = lineal_lad.copy()
+
+        self.add(lineal_lad)
+        self.end_fragment()
+
+        self.play(*[mn.Indicate(e) for e in edges[:-2] + verts[:-1]])
+        self.end_fragment()
+
+        verts_tree = [mn.Dot(mn.ORIGIN, z_index=1), mn.Dot(mn.RIGHT, z_index=1), mn.Dot(2*mn.RIGHT, z_index=1), mn.Dot(3*mn.RIGHT, z_index=1), mn.Dot(4*mn.RIGHT, z_index=1), mn.Dot(mn.DOWN, z_index=1), mn.Dot(mn.UP, z_index=1)]
+        edges_comb = [[0, 1], [1, 2], [2, 3], [3, 4]] #[[0, 5], [0, 6]]
+        edges_tree = []
+        for idx in edges_comb:
+            edges_tree.append(bez_edge(start=verts_tree[idx[0]], end=verts_tree[idx[1]], color=mn.BLUE, direction=mn.UP))
+            edges_tree.append(bez_edge(start=verts_tree[idx[1]], end=verts_tree[idx[0]], color=mn.RED, direction=mn.UP))
+        for idx in [[0, 5], [6, 0]]:
+            edges_tree.append(bez_edge(start=verts_tree[idx[0]], end=verts_tree[idx[1]], color=mn.GREEN, direction=mn.UP))
+            edges_tree.append(bez_edge(start=verts_tree[idx[1]], end=verts_tree[idx[0]], color=mn.BLUE, direction=mn.UP))
+
+        tree_base = mn.VGroup(*verts_tree, *edges_tree) # 13 Objects
+
+        tree = mn.VGroup()
+
+        for i in range(-4, 5):
+            tree.add(tree_base.copy().shift(i*4*mn.RIGHT))
+
+        tree.scale(1.35).shift(1*tree[4][0].get_center()*mn.LEFT)
+
+        self.play(mn.ReplacementTransform(lineal_lad, tree))
+        lineal_lad = ll.scale(1/1.25)
+        self.end_fragment()
+        self.play(tree.animate.shift(10*mn.LEFT), rate_func=mn.rate_functions.smoothstep)
+        self.play(tree.animate.shift(-10*mn.LEFT), rate_func=mn.rate_functions.smoothstep)
+        self.end_fragment()
+
+        rotate_group = mn.VGroup(tree[4][5], tree[4][6], tree[4][16], tree[4][17], tree[4][18], tree[4][15]) 
+
+        self.play(mn.Rotate(rotate_group, angle=np.pi, axis=np.array([1, 0, 0]), about_point=mn.ORIGIN))
+        self.end_fragment()
 
 
+        self.play(mn.FadeOut(tree, shift=mn.DOWN))
 
+        disc_cond, _, _ = create_paragraph(r"Let $X$ be a set and $G \leq \operatorname{Sym}(G)$. Then $G$ is discrete if and only if there is a finite set $F$ such that $G_F$ is trivial.")
+
+        self.play(mn.FadeIn(disc_cond, shift=mn.DOWN))
+        self.end_fragment()
+
+        lineal_thm, _, _ = create_paragraph(r"If $G$ is a ($P$)-closed group of ", "lineal type", " then $G$ is discrete if and only if every vertex label in the local action diagram is trivial.")
+        lineal_thm[2].set_color(mn.YELLOW)
+
+        self.play(mn.FadeOut(disc_cond, shift=mn.DOWN))
+        self.play(mn.FadeIn(lineal_thm, shift=mn.DOWN))
+        self.end_fragment()
+
+        lineal_lad.shift(2.5*mn.UP)
+
+        self.play(mn.FadeOut(lineal_thm, shift=mn.UP))
+        self.play(mn.FadeIn(tree, shift=mn.UP))
+        self.end_fragment()
+
+        self.play(tree.animate.shift(2*mn.DOWN), mn.FadeIn(lineal_lad, shift=mn.DOWN))
+        self.end_fragment()
+
+        fin_set = mn.Ellipse(width=8.75, height=2.5, color=mn.YELLOW).shift(1.35*4.0*mn.RIGHT + 2*mn.DOWN).scale(1.35)
+        self.play(mn.GrowFromCenter(fin_set))
+        self.end_fragment()
+        tree.add(fin_set)
+
+        self.play(tree.animate.shift(12*mn.LEFT))
+        self.end_fragment()
+
+        rotate_group = mn.VGroup(tree[7][5], tree[7][6], tree[7][16], tree[7][17], tree[7][18], tree[7][15]) 
+
+        self.play(mn.Indicate(lineal_lad[-3]))
+        self.end_fragment()
+        self.play(mn.Indicate(tree[6][14]))
+        self.end_fragment()
+        
+
+        self.play(mn.Rotate(rotate_group, angle=np.pi, axis=np.array([1, 0, 0]), about_point=tree[7][0].get_center()))
+        self.end_fragment()
+
+        self.play(mn.FadeOut(mn.VGroup(tree, lineal_lad), shift=mn.DOWN))
+        self.end_fragment()
 
 
 class Ending(PresentationScene):
     def construct(self):
-        bib_para, _, _ = create_paragraph("blah", r'''
-Morton Brown and Robert Connelly, On graphs with a constant link, New Directions in the Theory of Graphs, Academic Press, 1973.
-
+        bib_para, _, _ = create_paragraph("", r'''
 M. Burger and S. Mozes, Groups acting on trees: from local to global structure, Publications Mathématiques de l’IHÉS 92 (2000), no. 1, 113–150.
 
-François Charton, Jordan S. Ellenberg, Adam Zsolt Wagner, and Geordie Williamson, Patternboost: Constructions in mathematics with a little help from ai, 2024.
-
-Marcus Chijoff, Writing a GAP package for local action diagrams, 2023.
-
-Marcus Chijoff and Stephan Tornier, Discrete (p)-closed groups acting on trees, 2024.
-
-The GAP Group, GAP – Groups, Algorithms, and Programming, Ver- sion 4.8.7, 2017.
-
-Yitzhak Katznelson, An introduction to harmonic analysis, Cambridge University Press, 1976.
+M. Chijoff and S. Tornier, Discrete (p)-closed groups acting on trees, 2024.
 
 B. Krön and R. Möller, Analogues of Cayley graphs for topological groups, Mathematische Zeitschrift 258 (2008), no. 3, 637.
 
 Colin D. Reid and Simon M. Smith, Groups acting on trees with tits’ independence property (p), 2022.
 
-J.-P. Serre, Trees, Springer, 1980.
-
-S. Smith, A product for permutation groups and topological groups, Duke Mathematical Journal 166 (2017), no. 15, 2965–2999.
-
 J. Tits, Sur le groupe des automorphismes d’un arbre, Essays on topology and related topics, Springer, 1970, pp. 188–211.
-
-D. Van Dantzig, Zur topologischen Algebra. III. Brouwersche und Can- torsche Gruppen, Compositio Mathematica 3 (1936), 408–426 (de).  
-
-George A Willis, The structure of totally disconnected locally compact groups, Mathematische Annalen 300 (1994), no. 1, 341–363.
 ''', 9, font_size=38)
 
         bib_para.shift((-1*bib_para.get_top()-7*mn.UP))
@@ -922,5 +1039,19 @@ George A Willis, The structure of totally disconnected locally compact groups, M
         self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=5, rate_fun=mn.rate_functions.linear)
 
         q = mn.Text("?").scale(2.5)
+        q2 = mn.Text("?").scale(2.5)
         self.play(mn.Write(q))
+        self.end_fragment()
+
+        man = mn.Text("Manim").scale(1.5)
+        m_a = mn.Text("Math Animation").scale(1.5)
+        js = mn.Text("Reveal JS").scale(1.5)
+
+        self.play(mn.ReplacementTransform(q, man))
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(man, m_a))
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(m_a, js))
+        self.end_fragment()
+        self.play(mn.ReplacementTransform(js, q2))
         self.end_fragment()
