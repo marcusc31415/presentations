@@ -604,7 +604,7 @@ class PGTCPresentation(PresentationScene):
         lad_edges = mn.VGroup(rc, gc, bc)
 
         self.remove(lad_edges)
-        self.end_fragment()
+        # REMOVE THIS LINE? ###self.end_fragment()
 
 
 
@@ -961,12 +961,12 @@ class PGTCPresentation(PresentationScene):
 
         self.play(mn.FadeOut(tree, shift=mn.DOWN))
 
-        disc_cond, _, _ = create_paragraph(r"Let $X$ be a set and $G \leq \operatorname{Sym}(G)$. Then $G$ is discrete if and only if there is a finite set $F$ such that $G_F$ is trivial.")
+        disc_cond, _, _ = create_paragraph(r"Let $X$ be a set and $G \leq \operatorname{Sym}(G)$. Then $G$ is discrete if and only if there is a finite set $F$ such that $G_F$ is the trivial group.")
 
         self.play(mn.FadeIn(disc_cond, shift=mn.DOWN))
         self.end_fragment()
 
-        lineal_thm, _, _ = create_paragraph(r"If $G$ is a ($P$)-closed group of ", "lineal type", " then $G$ is discrete if and only if every vertex label in the local action diagram is trivial.")
+        lineal_thm, _, _ = create_paragraph(r"If $G$ is a ($P$)-closed group of ", "lineal type", " then $G$ is discrete if and only if every vertex label in the local action diagram is the trivial group.")
         lineal_thm[2].set_color(mn.YELLOW)
 
         self.play(mn.FadeOut(disc_cond, shift=mn.DOWN))
@@ -1020,20 +1020,17 @@ J. Tits, Sur le groupe des automorphismes d’un arbre, Essays on topology and r
         self.add(bib_para)
         self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=5, rate_fun=mn.rate_functions.linear)
 
-        q = mn.Text("?").scale(2.5)
-        q2 = mn.Text("?").scale(2.5)
-        self.play(mn.Write(q))
         self.end_fragment()
 
         man = mn.Text("Manim").scale(1.5)
-        m_a = mn.Text("Math Animation").scale(1.5)
+        m_a = mn.Text("3Blue1Brown").scale(1.5)
         js = mn.Text("Reveal JS").scale(1.5)
 
-        self.play(mn.ReplacementTransform(q, man))
+        self.play(mn.Write(man))
         self.end_fragment()
         self.play(mn.ReplacementTransform(man, m_a))
         self.end_fragment()
         self.play(mn.ReplacementTransform(m_a, js))
         self.end_fragment()
-        self.play(mn.ReplacementTransform(js, q2))
+        self.play(mn.Unwrite(js))
         self.end_fragment()

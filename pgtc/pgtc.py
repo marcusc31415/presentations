@@ -1038,20 +1038,27 @@ J. Tits, Sur le groupe des automorphismes d’un arbre, Essays on topology and r
         self.add(bib_para)
         self.play(bib_para.animate.shift((bib_para.get_top()-bib_para.get_bottom()+12*mn.UP) ), run_time=5, rate_fun=mn.rate_functions.linear)
 
-        q = mn.Text("?").scale(2.5)
-        q2 = mn.Text("?").scale(2.5)
-        self.play(mn.Write(q))
         self.end_fragment()
+
+
+class Test(PresentationScene):
+    def construct(self):
 
         man = mn.Text("Manim").scale(1.5)
         m_a = mn.Text("Math Animation").scale(1.5)
         js = mn.Text("Reveal JS").scale(1.5)
 
-        self.play(mn.ReplacementTransform(q, man))
+        self.play(mn.Write(man))
         self.end_fragment()
         self.play(mn.ReplacementTransform(man, m_a))
         self.end_fragment()
         self.play(mn.ReplacementTransform(m_a, js))
         self.end_fragment()
-        self.play(mn.ReplacementTransform(js, q2))
+
+        confused_pi = mn.SVGMobject('SVG/PiCreatures_confused.svg', fill_color=mn.RED)
+        thought_bubble = mn.SVGMobject('SVG/Bubbles_thought.svg', color=mn.WHITE, stroke_opacity=1)
+
+        self.play(mn.ReplacementTransform(js, confused_pi))
+        self.add(thought_bubble)
+        self.wait(1)
         self.end_fragment()
