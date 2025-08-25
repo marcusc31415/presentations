@@ -1,0 +1,3 @@
+[submodule "hdr_festival_2025/manim_chess"]
+	path = hdr_festival_2025/manim_chess
+	url = https://github.com/patrik-ha/manim-chess.git
