@@ -61,18 +61,14 @@ def transform_colour(scene, mobject, colour=mn.YELLOW):
 
 class IntroScene(PresentationScene):
     def construct(self):
-        title = mn.Tex("The Orbit Counting Lemma", font_size=56).shift(mn.UP)
+        title = mn.Tex("The ", "Orbit Counting Lemma", font_size=56).shift(mn.UP)
         author = mn.Tex("Marcus Chijoff", font_size=32).next_to(title, mn.DOWN, 1)
         self.add(title, author)
         self.end_fragment()
 
-        grp_theory = mn.Tex("Group Theory", font_size=56).shift(mn.UP)
-        study = mn.Tex("The Study of Symmetry", font_size=56).next_to(title, mn.DOWN, 1)
+        self.play(mn.ApplyWave(title[1]))
+        self.end_fragment()
 
-        self.play(mn.ReplacementTransform(title, grp_theory))
-        self.end_fragment()
-        self.play(mn.ReplacementTransform(author, study))
-        self.end_fragment()
 
         exact_seq = mn.Tex(r"$1 \longrightarrow $", r" $G^{o}$ ", r" $\longrightarrow$ ", r" $G$ ", r" $\longrightarrow$ ", r" $G/ G^{o}$ ", r" $\longrightarrow$ ",  r"$1$", font_size=48)
 
@@ -81,7 +77,7 @@ class IntroScene(PresentationScene):
 
         dot = mn.Dot(point=mn.ORIGIN)
 
-        self.play(mn.ReplacementTransform(mn.VGroup(grp_theory, study), dot), rate_function=mn.rate_functions.linear)
+        #self.play(mn.ReplacementTransform(mn.VGroup(grp_theory, study), dot), rate_function=mn.rate_functions.linear)
 
         colours = {0: mn.RED, 1: mn.BLUE, 2: mn.GREEN}
         back_colours = {str(mn.RED): 0, str(mn.BLUE): 1, str(mn.GREEN): 2}
@@ -149,8 +145,9 @@ class IntroScene(PresentationScene):
             for lines in full_lines[dot_current:dot_next]:
                 line_list = line_list + lines
             if dot_current != 0:
-                self.play(*[mn.Create(i) for i in full_dots[dot_current:dot_next]], rate_func=mn.rate_functions.linear, run_time=0.35)
-            self.play(*[mn.Create(i) for i in line_list], rate_func=mn.rate_functions.linear, run_time=0.6)
+                pass
+                #self.play(*[mn.Create(i) for i in full_dots[dot_current:dot_next]], rate_func=mn.rate_functions.linear, run_time=0.35)
+            #self.play(*[mn.Create(i) for i in line_list], rate_func=mn.rate_functions.linear, run_time=0.6)
 
         text_group = mn.VGroup()
         red_text = mn.VGroup()
@@ -181,51 +178,51 @@ class IntroScene(PresentationScene):
                     case _:
                         raise Exception("NO LINE COLOUR!!:!!L!!IHO!H")
 
-        self.play(*[mn.Write(text, run_time=1) for text in text_group], rate_func=mn.rate_functions.linear)
-        self.end_fragment()
+        #self.play(*[mn.Write(text, run_time=1) for text in text_group], rate_func=mn.rate_functions.linear)
+        #self.end_fragment()
 
         tree = mn.VGroup(*full_dots, *full_lines, *text_group)
 
-        self.play(tree.animate.scale(0.5, about_point=mn.ORIGIN).shift(3*mn.RIGHT))
-        self.end_fragment()
+        #self.play(tree.animate.scale(0.5, about_point=mn.ORIGIN).shift(3*mn.RIGHT))
+        #self.end_fragment()
 
-        exact_seq.scale(0.75).shift(3.75*mn.LEFT + 2*mn.UP)
+        #exact_seq.scale(0.75).shift(3.75*mn.LEFT + 2*mn.UP)
 
-        self.play(mn.Write(exact_seq))
-        self.end_fragment()
+        #self.play(mn.Write(exact_seq))
+        #self.end_fragment()
 
 
-        long_equation = mn.MathTex(r'''s(g) = &\left\lvert G(o(a_1))_{c_1} \cdot x_1\right\rvert \cdot \prod_{k=2}^{n}\left\lvert G(o(a_{k}))_{c_{k}} \cdot d_{k-1}\right\rvert \\ &\cdot \left\lvert G(o(b_1))_{x_1} \cdot d_{n}\right\rvert \cdot \prod_{k=2}^{m}\left\lvert G(o(b_{k}))_{x_{k}} \cdot y_{k-1}\right\rvert''')
-        long_equation.scale(0.6)
+        #long_equation = mn.MathTex(r'''s(g) = &\left\lvert G(o(a_1))_{c_1} \cdot x_1\right\rvert \cdot \prod_{k=2}^{n}\left\lvert G(o(a_{k}))_{c_{k}} \cdot d_{k-1}\right\rvert \\ &\cdot \left\lvert G(o(b_1))_{x_1} \cdot d_{n}\right\rvert \cdot \prod_{k=2}^{m}\left\lvert G(o(b_{k}))_{x_{k}} \cdot y_{k-1}\right\rvert''')
+        #long_equation.scale(0.6)
 
-        long_equation.next_to(exact_seq, mn.DOWN, 1)
-        long_equation.align_to(exact_seq, mn.LEFT)
+        #long_equation.next_to(exact_seq, mn.DOWN, 1)
+        #long_equation.align_to(exact_seq, mn.LEFT)
 
-        self.play(mn.Write(long_equation))
-        self.end_fragment()
+        #self.play(mn.Write(long_equation))
+        #self.end_fragment()
 
-        cgtdlc = mn.Tex("Compactly Generated Totally Disconnected \\\\ Locally Compact Groups")
+        #cgtdlc = mn.Tex("Compactly Generated Totally Disconnected \\\\ Locally Compact Groups")
 
-        cgtdlc.scale(0.75)
-        cgtdlc.next_to(long_equation, mn.DOWN, 1)
-        cgtdlc.align_to(exact_seq, mn.LEFT)
+        #cgtdlc.scale(0.75)
+        #cgtdlc.next_to(long_equation, mn.DOWN, 1)
+        #cgtdlc.align_to(exact_seq, mn.LEFT)
 
-        self.play(mn.Write(cgtdlc))
-        self.end_fragment()
+        #self.play(mn.Write(cgtdlc))
+        #self.end_fragment()
 
-        all_obj = mn.Group(*self.mobjects)
-        ul = mn.Underline(all_obj, z_index=2)
-        ul_rect = mn.Rectangle(width=all_obj.width, height=all_obj.height*1.1, z_index=2)\
-                .next_to(ul, mn.DOWN, buff=0)\
-                .set_style(fill_opacity=1, stroke_width=0, fill_color=mn.BLACK)
-        fade_grp = mn.VGroup(ul, ul_rect)
-        self.play(mn.GrowFromCenter(ul), mn.GrowFromCenter(ul_rect))
-        self.add(fade_grp)
-        self.play(fade_grp.animate.shift(mn.UP*ul_rect.height))
-        self.play(mn.ShrinkToCenter(ul))
-        self.end_fragment()
+        #all_obj = mn.Group(*self.mobjects)
+        #ul = mn.Underline(all_obj, z_index=2)
+        #ul_rect = mn.Rectangle(width=all_obj.width, height=all_obj.height*1.1, z_index=2)\
+        #        .next_to(ul, mn.DOWN, buff=0)\
+        #        .set_style(fill_opacity=1, stroke_width=0, fill_color=mn.BLACK)
+        #fade_grp = mn.VGroup(ul, ul_rect)
+        #self.play(mn.GrowFromCenter(ul), mn.GrowFromCenter(ul_rect))
+        #self.add(fade_grp)
+        #self.play(fade_grp.animate.shift(mn.UP*ul_rect.height))
+        #self.play(mn.ShrinkToCenter(ul))
+        #self.end_fragment()
 
-        self.remove(*self.mobjects)
+        #self.remove(*self.mobjects)
 
         #################
         ## Group Intro ##
@@ -241,7 +238,8 @@ class IntroScene(PresentationScene):
 
         triangle.scale(2.5).move_to(mn.ORIGIN)
 
-        self.play(mn.GrowFromCenter(triangle))
+        #self.play(mn.GrowFromCenter(triangle))
+        self.play(mn.ReplacementTransform(mn.VGroup(title, author), triangle))
         self.end_fragment()
 
 
@@ -262,7 +260,7 @@ class IntroScene(PresentationScene):
         tri_copy = triangle.copy()
 
 
-        tree.shift(-3*mn.RIGHT).scale(2, about_point=mn.ORIGIN)
+        #tree.shift(-3*mn.RIGHT).scale(2, about_point=mn.ORIGIN)
 
         self.play(mn.ReplacementTransform(triangle, tree))
         self.end_fragment()
@@ -428,13 +426,13 @@ class IntroScene(PresentationScene):
         self.play(mn.Write(new_text[0][3:9]))
         self.end_fragment()
 
-        full_form = mn.MathTex(r"\operatorname{flags}(n, k) = \begin{cases} \frac{k^n + k^{n/2}}{2} & n \text{ even} \\ \frac{k^n + k + k^{(n-1)/2}}{2} & n \text{ odd} \end{cases}")
+        full_form = mn.MathTex(r"\operatorname{flags}(n, k) = \frac{k^n + k^{\lceil n/2 \rceil}}{2}")
 
         full_grp = mn.VGroup(*f_grp, formula_oc[0][0:12], grp_size, new_text)
         self.play(mn.ReplacementTransform(full_grp, full_form))
         self.end_fragment()
 
-        dr_who = mn.MathTex(r"1.34\times 10^{74}")
+        dr_who = mn.MathTex(r"1.67\times 10^{73}")
 
         self.play(mn.ReplacementTransform(full_form, dr_who))
         self.end_fragment()
