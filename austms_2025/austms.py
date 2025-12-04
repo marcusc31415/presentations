@@ -10,7 +10,7 @@ sections = []
 sections.append("Intro")
 sections.append("Property P")
 sections.append("LAD")
-sections.append("Group Type")
+sections.append("Types")
 sections.append("Discrete")
 sections.append("Scale")
 sections.append("Uniscalar")
@@ -77,11 +77,12 @@ class IntroScene(PresentationScene):
         if "Intro" in sections:
             title = mn.Tex("Determining Properties of (P)-closed Groups Acting On Trees \\\\ Using Local Action Diagrams", font_size=48).shift(mn.UP)
             author = mn.Tex("Marcus Chijoff", font_size=32).next_to(title, mn.DOWN, 1)
-            uni = mn.Tex("The University of Newcastle", font_size=26).next_to(author, mn.DOWN, 1)
-            self.add(title, author, uni)
+            sup = mn.Tex("Supervisors: Michal Ferov and Stephan Tornier", font_size=35).next_to(title, mn.DOWN, 1)
+            uni = mn.Tex("The University of Newcastle", font_size=26).next_to(sup, mn.DOWN, 1)
+            self.add(title, author, sup, uni)
             self.end_fragment()
 
-            self.remove(title, author, uni)
+            self.remove(title, author, sup, uni)
             self.end_fragment()
 
             props = [mn.Tex(t) for t in ["Discreteness", "Scale Values", "Uniscalarity", "Unimodularity"]]
@@ -533,12 +534,17 @@ class IntroScene(PresentationScene):
 
             l_point = 2*mn.LEFT
             r_point = 2*mn.RIGHT
-            bez_point1 = mn.UP
-            bez_point2 = mn.DOWN
-            blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
-            red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
-            new_lad_edges = mn.VGroup(blue_curve, red_curve)
             new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
+            l_point = new_lad_dots[0]
+            r_point = new_lad_dots[1]
+            #bez_point1 = mn.UP
+            #bez_point2 = mn.DOWN
+            #blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
+            #red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
+
+            blue_curve = bez_edge(l_point, r_point, mn.BLUE, mn.UP, label=None)
+            red_curve = bez_edge(r_point, l_point, mn.RED, mn.UP, label=None)
+            new_lad_edges = mn.VGroup(blue_curve, red_curve)
             new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
 
             for label, dot in zip(new_lad_dot_labels, new_lad_dots):
@@ -548,14 +554,14 @@ class IntroScene(PresentationScene):
 
             for i, (label, edge) in enumerate(zip(new_lad_edge_labels, new_lad_edges)):
                 if i == 0:
-                    label.next_to(edge, mn.UP, 8*mn.SMALL_BUFF).scale(0.75)
+                    label.next_to(edge, mn.UP, 1*mn.SMALL_BUFF).scale(0.75)
                 else:
-                    label.next_to(edge, mn.DOWN, 8*mn.SMALL_BUFF).scale(0.75)
+                    label.next_to(edge, mn.DOWN, 1*mn.SMALL_BUFF).scale(0.75)
 
-            tip = mn.Triangle(color=mn.BLUE, fill_color=mn.BLUE, fill_opacity=1).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.125)
-            tip2 = mn.Triangle(color=mn.RED, fill_color=mn.RED, fill_opacity=1).rotate(1*np.pi/2).move_to(new_lad_edges[1].point_from_proportion(0.5)).scale(0.125)
-            new_lad_edges.add(tip)
-            new_lad_edges.add(tip2)
+            #tip = mn.Triangle(color=mn.BLUE, fill_color=mn.BLUE, fill_opacity=1).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.125)
+            #tip2 = mn.Triangle(color=mn.RED, fill_color=mn.RED, fill_opacity=1).rotate(1*np.pi/2).move_to(new_lad_edges[1].point_from_proportion(0.5)).scale(0.125)
+            #new_lad_edges.add(tip)
+            #new_lad_edges.add(tip2)
 
             animations = [
                     mn.ReplacementTransform(lad_edges, new_lad_edges),
@@ -581,21 +587,6 @@ class IntroScene(PresentationScene):
                 return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
 
             labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
-            def _bez_edge(start, end, color, direction, label=0):
-                l_point = start.get_center()
-                r_point = start.get_center() + 1*mn.RIGHT
-                bez_point1 = 0.25*direction + start.get_center() + 0.5*mn.RIGHT
-                bez_point2 = -0.25*direction + start.get_center() + 0.5*mn.RIGHT
-                curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=color)
-                label = labels[label].copy().move_to((2*start.get_center() + mn.RIGHT)/2).shift(0.325*direction).scale(0.35)
-                if end.get_center()[0] < start.get_center()[0]:
-                    label = label.rotate(np.pi)
-                    tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
-                else:
-                    tip = mn.Triangle(color=color, fill_color=color, fill_opacity=1).rotate(-1*np.pi/2).move_to(curve.point_from_proportion(0.5)).scale(0.125/6)
-                grp = mn.VGroup(curve, label, tip)
-                grp.rotate(angle=np.arctan2((end.get_center()-start.get_center())[1], (end.get_center()-start.get_center())[0]), about_point=start.get_center())
-                return grp
 
 
             tree_verts.add(mn.Dot(mn.ORIGIN, z_index=1))
@@ -607,26 +598,26 @@ class IntroScene(PresentationScene):
 
 
 
-            tree_edges.add(_bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.DOWN, 0))  #0
-            tree_edges.add(_bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.DOWN, 1))  #1
-            tree_edges.add(_bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.DOWN, 2))   #2
-            tree_edges.add(_bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.DOWN, 2))   #3
-            tree_edges.add(_bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, 3))     #4
-            tree_edges.add(_bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, 4))     #5
-            tree_edges.add(_bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, 0))    #6
-            tree_edges.add(_bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, 0))    #7
-            tree_edges.add(_bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.DOWN, 3))   #8
-            tree_edges.add(_bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.DOWN, 4))   #9
-            tree_edges.add(_bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.DOWN, 0))  #10
-            tree_edges.add(_bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.DOWN, 0))  #11
-            tree_edges.add(_bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, 1))    #12
-            tree_edges.add(_bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, 2))     #13
-            tree_edges.add(_bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, 1))    #14
-            tree_edges.add(_bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, 2))     #15
-            tree_edges.add(_bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.DOWN, 1))  #16
-            tree_edges.add(_bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.DOWN, 2))   #17
-            tree_edges.add(_bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.DOWN, 1)) #18
-            tree_edges.add(_bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.DOWN, 2))  #19
+            tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #0
+            tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #1
+            tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #2
+            tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #3
+            tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #4
+            tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #5
+            tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #6
+            tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #7
+            tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #8
+            tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #9
+            tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #10
+            tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #11
+            tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #12
+            tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #13
+            tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #14
+            tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #15
+            tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #16
+            tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #17
+            tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))   #18
+            tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))    #19
 
             for start, end in zip(tree_verts[3:7], tree_verts[7:11]):
                 line_dir = end.get_center() - start.get_center()
@@ -641,8 +632,8 @@ class IntroScene(PresentationScene):
             whole_tree.scale(1.5)
 
             # Creating the tree animation
-            lad_edge_1 = mn.VGroup(new_lad_edges[0], tip)
-            lad_edge_2 = mn.VGroup(new_lad_edges[1], tip2)
+            lad_edge_1 = new_lad_edges[0]
+            lad_edge_2 = new_lad_edges[1]
 
             self.play(mn.Indicate(new_lad_dots[0]))
             self.end_fragment()
@@ -666,17 +657,17 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             # Coloured path
-            col_path_grp = mn.VGroup(tree_edges[0].copy(), tree_edges[4].copy(), tree_edges[12].copy())
+            #col_path_grp = mn.VGroup(tree_edges[0].copy(), tree_edges[4].copy(), tree_edges[12].copy())
 
 
-            self.play(col_path_grp.animate.set_color(mn.YELLOW))
-            self.end_fragment()
+            #self.play(col_path_grp.animate.set_color(mn.YELLOW))
+            #self.end_fragment()
 
-            self.play(mn.Indicate(tree_verts[7]))
-            self.end_fragment()
+            #self.play(mn.Indicate(tree_verts[7]))
+            #self.end_fragment()
 
-            self.play(mn.FadeOut(col_path_grp))
-            self.end_fragment()
+            #self.play(mn.FadeOut(col_path_grp))
+            #self.end_fragment()
 
             # Show aut
             self.play(mn.Indicate(tree_verts[0]), mn.Indicate(tree_edges[0]), mn.Indicate(tree_edges[1]))
@@ -835,8 +826,14 @@ class IntroScene(PresentationScene):
 
             ]
 
+            extra_pts = [mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] + 0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] + 0.76), 0])),
+                         mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] -  0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] - 0.76), 0])),
+                        ]
 
-            lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines)
+            extra_lines = [mn.Line(start=pts3[0].get_center(), end=extra_pts[0].get_center()), mn.Line(start=pts3[0].get_center(), end=extra_pts[1].get_center())]
+
+
+            lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines, *extra_pts, *extra_lines)
 
             self.play(mn.ReplacementTransform(title, lad))
             self.end_fragment()
@@ -849,7 +846,9 @@ class IntroScene(PresentationScene):
                       *[mn.Indicate(pt) for pt in pts4],
                       *[mn.Indicate(pt) for pt in pts5],
                       *[mn.Indicate(pt) for pt in pts6],
-                      *[mn.Indicate(line) for line in lines]
+                      *[mn.Indicate(line) for line in lines],
+                      *[mn.Indicate(pt) for pt in extra_pts],
+                      *[mn.Indicate(line) for line in extra_lines]
                      )
             self.end_fragment()
 
@@ -886,13 +885,46 @@ class IntroScene(PresentationScene):
             a1.set_z_index(5)
             a2.set_z_index(5)
 
-            tree = mn.VGroup(*a1, *a2, *a3, *a4, *a5, *a6, *other)
+            # Add extra stuff to the tree. 
+
+            d1 = mn.Dot(3*mn.UP + 2*mn.LEFT)
+            d2 = mn.Dot(1*mn.UP + 2*mn.LEFT)
+            l1 = mn.Line(start=2*(mn.UP+mn.LEFT), end=3*mn.UP+2*mn.LEFT)
+            l2 = mn.Line(start=2*(mn.UP+mn.LEFT), end=1*mn.UP+2*mn.LEFT)
+
+
+
+            tree = mn.VGroup(*a1, *a2, *a3, *a4, *a5, *a6, *other, d1, d2, l1, l2)
 
             self.play(mn.ReplacementTransform(lad, tree))
             self.end_fragment()
 
             self.play(mn.FadeOut(tree, shift=mn.UP))
             self.end_fragment()
+
+            # Discrete Theorem 
+
+            disc_thm = create_paragraph(r'''
+                Let $\Delta = (\Gamma, (X_{a}), (G(v)))$ be a local action diagram, $\mathbf T = (T, \pi, L)$ be a $\Delta$-tree, and $G:=\mathbf U(\mathbf{T},(G(v)))\leq\operatorname{Aut}_{\pi}(T)$. If $G$ is of type
+                \begin{description}
+                    \item[(Fixed vertex)] then $G$ is discrete if and only if $G(v)$ is trivial for almost all $v\in V\Gamma$, and whenever $X_{v}$ ($v\in V\Gamma$) is infinite then $G(v)$ has a finite base and $G(u)$ is trivial for every $u\in V\Gamma$ such that the arc $a\in o^{-1}(v)$ oriented towards $u$ has an infinite colour set.
+                    \item[(Inversion)] then $G$ is discrete if and only if $G(v)$ is trivial for almost all $v\in V\Gamma$, and whenever $X_{v}$ ($v\in V\Gamma$) is infinite then $G(v)$ has a finite base and $G(u)$ is trivial for every $u\in V\Gamma$ such that the arc $a\in o^{-1}(v)$ oriented towards $u$ has an infinite colour set.
+                    \item[(Lineal)] then $G$ is discrete if and only if $G(v)$ is trivial for all $v\in V\Gamma$.
+                    \item[(Horocyclic)] then $G$ is non-discrete.
+                    \item[(Focal)] then $G$ is non-discrete.
+                    \item[(General)] then $G$ is discrete if and only if $G(v)$ is semiregular for all $v\in V\Gamma'$ and trivial otherwise, where $\Gamma'$ is the unique smallest cotree of $\Delta$.
+                \end{description}
+            ''', font_size=23)[0]
+
+            self.add(disc_thm)
+            self.end_fragment()
+
+            self.play(disc_thm[1][625:].animate.set_color(mn.YELLOW))
+            self.end_fragment()
+
+            self.play(mn.FadeOut(disc_thm, shift=mn.UP))
+            self.end_fragment()
+
 
         #############
         ### Scale ###
@@ -1054,14 +1086,14 @@ class IntroScene(PresentationScene):
 
 
             # Vertex formula colour
-            transform_colour(self, vert_str, mn.ORANGE)
+            transform_colour(self, vert_str, mn.PINK)
             self.end_fragment()
             
             cv = verts[5]
 
             cv.save_state()
-            cvscale = cv.copy().scale(1.2).set_color(mn.ORANGE)
-            cvcolour = cv.copy().set_color(mn.ORANGE)
+            cvscale = cv.copy().scale(1.2).set_color(mn.PINK)
+            cvcolour = cv.copy().set_color(mn.PINK)
             self.play(mn.Transform(cv, cvscale), run_time=0.5)
             self.play(mn.Transform(cv, cvcolour), run_time=0.5)
             self.end_fragment()
@@ -1133,8 +1165,15 @@ class IntroScene(PresentationScene):
 
             ]
 
+            extra_pts = [mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] + 0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] + 0.76), 0])),
+                         mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] -  0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] - 0.76), 0])),
+                        ]
 
-            lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines)
+            extra_lines = [mn.Line(start=pts3[0].get_center(), end=extra_pts[0].get_center()), mn.Line(start=pts3[0].get_center(), end=extra_pts[1].get_center())]
+
+
+            lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines, *extra_pts, *extra_lines)
+
 
             self.play(mn.ReplacementTransform(title, lad))
             self.end_fragment()
@@ -1147,7 +1186,9 @@ class IntroScene(PresentationScene):
                       *[mn.Indicate(pt) for pt in pts4],
                       *[mn.Indicate(pt) for pt in pts5],
                       *[mn.Indicate(pt) for pt in pts6],
-                      *[mn.Indicate(line) for line in lines]
+                      *[mn.Indicate(line) for line in lines],
+                      *[mn.Indicate(pt) for pt in extra_pts],
+                      *[mn.Indicate(line) for line in extra_lines]
                      )
             self.end_fragment()
 
@@ -1185,10 +1226,6 @@ class IntroScene(PresentationScene):
             a2.set_z_index(5)
 
             tree = mn.VGroup(*a1, *a2, *a3, *a4, *a5, *a6, *other)
-
-            self.play(mn.ReplacementTransform(lad, tree))
-            self.end_fragment()
-
             # Add extra stuff to the tree. 
 
             d1 = mn.Dot(3*mn.UP + 2*mn.LEFT)
@@ -1201,11 +1238,11 @@ class IntroScene(PresentationScene):
             tree.add(l1)
             tree.add(l2)
 
-            extra = mn.VGroup(d1, d2, l1, l2)
-
-            self.play(mn.GrowFromPoint(extra, 2*(mn.UP+mn.LEFT)))
+            self.play(mn.ReplacementTransform(lad, tree))
             self.end_fragment()
 
+
+            extra = mn.VGroup(d1, d2, l1, l2)
             extra.add(points[2])
 
             self.play(mn.Rotate(extra, about_point=2*(mn.UP+mn.LEFT), axis=np.array([1, 0, 0])))
@@ -1295,12 +1332,12 @@ class IntroScene(PresentationScene):
             self.play(mn.FadeOut(grp, shift=mn.UP))
             self.end_fragment()
 
-            dot1 = mn.Dot(3*mn.UP + 8*mn.LEFT, z_index=1)
-            dot2 = mn.Dot(3*mn.UP + 5*mn.LEFT, z_index=1)
-            dot3 = mn.Dot(3*mn.UP + -5*mn.LEFT, z_index=1)
-            dot4 = mn.Dot(3*mn.DOWN + 5*mn.LEFT, z_index=1)
+            dot1 = mn.Dot(3*mn.UP + 6*mn.LEFT, z_index=1)
+            dot2 = mn.Dot(3*mn.UP + 3*mn.LEFT, z_index=1)
+            dot3 = mn.Dot(3*mn.UP + -3*mn.LEFT, z_index=1)
+            dot4 = mn.Dot(3*mn.DOWN + 3*mn.LEFT, z_index=1)
             dot5 = mn.Dot(3*mn.DOWN + 0*mn.LEFT, z_index=1)
-            dot6 = mn.Dot(3*mn.DOWN + -5*mn.LEFT, z_index=1)
+            dot6 = mn.Dot(3*mn.DOWN + -3*mn.LEFT, z_index=1)
 
             e1 = bez_edge(dot4, dot6, mn.BLUE, mn.UP)
             e1r = bez_edge(dot6, dot4, mn.RED, mn.UP)
