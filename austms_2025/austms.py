@@ -514,168 +514,168 @@ class IntroScene(PresentationScene):
             self.play(mn.ReplacementTransform(mn.VGroup(lg1, bt), mn.VGroup(bc, ll[3])))
             self.end_fragment()
 
-            lad_grp = mn.VGroup(ld, ll[1], ll[2], ll[3], rc, gc, bc, ll[0])
+           # lad_grp = mn.VGroup(ld, ll[1], ll[2], ll[3], rc, gc, bc, ll[0])
 
 
-            # 2nd LAD bez_edge(start, end, color, direction, label, labels)
+           # # 2nd LAD bez_edge(start, end, color, direction, label, labels)
 
-            lad_edges = mn.VGroup(rc, gc, bc)
+           # lad_edges = mn.VGroup(rc, gc, bc)
 
-            self.remove(lad_edges)
-            # REMOVE THIS LINE? ###self.end_fragment()
-
-
-
-            #SECOND CONSTRUCTION SCENE #
-
-            #lad_edges = mn.VGroup(red_curve, blue_curve, green_curve)
-
-            l_point = 2*mn.LEFT
-            r_point = 2*mn.RIGHT
-            new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
-            l_point = new_lad_dots[0]
-            r_point = new_lad_dots[1]
-            #bez_point1 = mn.UP
-            #bez_point2 = mn.DOWN
-            #blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
-            #red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
-
-            blue_curve = bez_edge(l_point, r_point, mn.BLUE, mn.UP, label=None)
-            red_curve = bez_edge(r_point, l_point, mn.RED, mn.UP, label=None)
-            new_lad_edges = mn.VGroup(blue_curve, red_curve)
-            new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
-
-            for label, dot in zip(new_lad_dot_labels, new_lad_dots):
-                label.next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
-
-            new_lad_edge_labels = mn.VGroup(mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3, 4, 5\}"))
-
-            for i, (label, edge) in enumerate(zip(new_lad_edge_labels, new_lad_edges)):
-                if i == 0:
-                    label.next_to(edge, mn.UP, 1*mn.SMALL_BUFF).scale(0.75)
-                else:
-                    label.next_to(edge, mn.DOWN, 1*mn.SMALL_BUFF).scale(0.75)
-
-            #tip = mn.Triangle(color=mn.BLUE, fill_color=mn.BLUE, fill_opacity=1).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.125)
-            #tip2 = mn.Triangle(color=mn.RED, fill_color=mn.RED, fill_opacity=1).rotate(1*np.pi/2).move_to(new_lad_edges[1].point_from_proportion(0.5)).scale(0.125)
-            #new_lad_edges.add(tip)
-            #new_lad_edges.add(tip2)
-
-            animations = [
-                    mn.ReplacementTransform(lad_edges, new_lad_edges),
-                    mn.ReplacementTransform(ld, new_lad_dots),
-                    mn.ReplacementTransform(mn.VGroup(ll[1], ll[2], ll[3]), new_lad_edge_labels),
-                    mn.ReplacementTransform(ll[0], new_lad_dot_labels)
-                    ]
-            
-            new_lad = mn.VGroup(new_lad_edges, new_lad_dots, new_lad_edge_labels, new_lad_dot_labels)       
-
-            self.play(mn.AnimationGroup(*animations))
-            self.end_fragment()
-
-            self.play(new_lad.animate.shift(2.75*mn.UP).scale(0.8))
-            self.end_fragment()
-
-            tree_verts = mn.VGroup()
-            tree_edges = mn.VGroup()
-            tree_labels = mn.VGroup()
-            tree_dots = mn.VGroup()
-
-            def angle_unit(angle):
-                return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
-
-            labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
-
-
-            tree_verts.add(mn.Dot(mn.ORIGIN, z_index=1))
-            tree_verts.add(mn.Dot(mn.LEFT, z_index=1), mn.Dot(mn.RIGHT, z_index=1))
-            tree_verts.add(mn.Dot(mn.LEFT + angle_unit(140), z_index=1), mn.Dot(mn.LEFT + angle_unit(220), z_index=1))
-            tree_verts.add(mn.Dot(mn.RIGHT + angle_unit(40), z_index=1), mn.Dot(mn.RIGHT + angle_unit(320), z_index=1))
-            tree_verts.add(mn.Dot(tree_verts[3].get_center() + angle_unit(140), z_index=1), mn.Dot(tree_verts[4].get_center() + angle_unit(220), z_index=1))
-            tree_verts.add(mn.Dot(tree_verts[5].get_center() + angle_unit(40), z_index=1), mn.Dot(tree_verts[6].get_center() + angle_unit(320), z_index=1))
+           # self.remove(lad_edges)
+           # # REMOVE THIS LINE? ###self.end_fragment()
 
 
 
-            tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #0
-            tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #1
-            tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #2
-            tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #3
-            tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #4
-            tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #5
-            tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #6
-            tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #7
-            tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #8
-            tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #9
-            tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #10
-            tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #11
-            tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #12
-            tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #13
-            tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #14
-            tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #15
-            tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #16
-            tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #17
-            tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))   #18
-            tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))    #19
+           # #SECOND CONSTRUCTION SCENE #
 
-            for start, end in zip(tree_verts[3:7], tree_verts[7:11]):
-                line_dir = end.get_center() - start.get_center()
-                dots = mn.Text("\u22ef")
-                angle = np.arctan2(line_dir[1], line_dir[0])
-                dots.rotate(angle + np.pi)
-                buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
-                dots.move_to(end.get_center() + buffer)
-                tree_dots.add(dots)
+           # #lad_edges = mn.VGroup(red_curve, blue_curve, green_curve)
 
-            whole_tree = mn.VGroup(tree_verts, tree_edges, tree_dots)
-            whole_tree.scale(1.5)
+           # l_point = 2*mn.LEFT
+           # r_point = 2*mn.RIGHT
+           # new_lad_dots = mn.VGroup(mn.Dot(point=l_point, z_index=1), mn.Dot(point=r_point, z_index=1)).set_z_index(1)
+           # l_point = new_lad_dots[0]
+           # r_point = new_lad_dots[1]
+           # #bez_point1 = mn.UP
+           # #bez_point2 = mn.DOWN
+           # #blue_curve = mn.CubicBezier(l_point, bez_point1, bez_point1, r_point, color=mn.BLUE)
+           # #red_curve = mn.CubicBezier(r_point, bez_point2, bez_point2, l_point, color=mn.RED)
 
-            # Creating the tree animation
-            lad_edge_1 = new_lad_edges[0]
-            lad_edge_2 = new_lad_edges[1]
+           # blue_curve = bez_edge(l_point, r_point, mn.BLUE, mn.UP, label=None)
+           # red_curve = bez_edge(r_point, l_point, mn.RED, mn.UP, label=None)
+           # new_lad_edges = mn.VGroup(blue_curve, red_curve)
+           # new_lad_dot_labels = mn.VGroup(mn.MathTex(r"C_2"), mn.MathTex(r"S_3"))
 
-            self.play(mn.Indicate(new_lad_dots[0]))
-            self.end_fragment()
-            self.play(mn.Create(tree_verts[0]))
-            self.end_fragment()
-            self.play(mn.Indicate(lad_edge_1))
-            self.end_fragment()
-            self.play(mn.Create(tree_edges[0]), mn.Create(tree_edges[1]), mn.Create(tree_verts[1]), mn.Create(tree_verts[2]))
-            self.end_fragment()
-            self.play(mn.Indicate(lad_edge_2))
-            self.end_fragment()
-            self.play(mn.Create(tree_edges[2]), mn.Create(tree_edges[3]))
-            self.end_fragment()
-            self.play(*[mn.Create(tree_edges[i]) for i in {4, 5, 8, 9}], *[mn.Create(tree_verts[i]) for i in range (3, 7)])
-            self.end_fragment()
-            self.play(mn.Indicate(lad_edge_1))
-            self.end_fragment()
-            self.play(*[mn.Create(tree_edges[i]) for i in {6, 7, 10, 11}])
-            self.end_fragment()
-            self.play(*[mn.Create(tree_edges[i]) for i in range(12, 20)], *[mn.Create(tree_verts[i]) for i in range(7, 11)], *[mn.Write(d) for d in tree_dots])
-            self.end_fragment()
+           # for label, dot in zip(new_lad_dot_labels, new_lad_dots):
+           #     label.next_to(dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
 
-            # Coloured path
-            #col_path_grp = mn.VGroup(tree_edges[0].copy(), tree_edges[4].copy(), tree_edges[12].copy())
+           # new_lad_edge_labels = mn.VGroup(mn.MathTex(r"\{1, 2\}"), mn.MathTex(r"\{3, 4, 5\}"))
 
+           # for i, (label, edge) in enumerate(zip(new_lad_edge_labels, new_lad_edges)):
+           #     if i == 0:
+           #         label.next_to(edge, mn.UP, 1*mn.SMALL_BUFF).scale(0.75)
+           #     else:
+           #         label.next_to(edge, mn.DOWN, 1*mn.SMALL_BUFF).scale(0.75)
 
-            #self.play(col_path_grp.animate.set_color(mn.YELLOW))
-            #self.end_fragment()
+           # #tip = mn.Triangle(color=mn.BLUE, fill_color=mn.BLUE, fill_opacity=1).rotate(-1*np.pi/2).move_to(new_lad_edges[0].point_from_proportion(0.5)).scale(0.125)
+           # #tip2 = mn.Triangle(color=mn.RED, fill_color=mn.RED, fill_opacity=1).rotate(1*np.pi/2).move_to(new_lad_edges[1].point_from_proportion(0.5)).scale(0.125)
+           # #new_lad_edges.add(tip)
+           # #new_lad_edges.add(tip2)
 
-            #self.play(mn.Indicate(tree_verts[7]))
-            #self.end_fragment()
+           # animations = [
+           #         mn.ReplacementTransform(lad_edges, new_lad_edges),
+           #         mn.ReplacementTransform(ld, new_lad_dots),
+           #         mn.ReplacementTransform(mn.VGroup(ll[1], ll[2], ll[3]), new_lad_edge_labels),
+           #         mn.ReplacementTransform(ll[0], new_lad_dot_labels)
+           #         ]
+           # 
+           # new_lad = mn.VGroup(new_lad_edges, new_lad_dots, new_lad_edge_labels, new_lad_dot_labels)       
 
-            #self.play(mn.FadeOut(col_path_grp))
-            #self.end_fragment()
+           # self.play(mn.AnimationGroup(*animations))
+           # self.end_fragment()
 
-            # Show aut
-            self.play(mn.Indicate(tree_verts[0]), mn.Indicate(tree_edges[0]), mn.Indicate(tree_edges[1]))
-            self.end_fragment()
-            self.play(mn.Indicate(new_lad_dot_labels[0]))
-            self.end_fragment()
+           # self.play(new_lad.animate.shift(2.75*mn.UP).scale(0.8))
+           # self.end_fragment()
+
+           # tree_verts = mn.VGroup()
+           # tree_edges = mn.VGroup()
+           # tree_labels = mn.VGroup()
+           # tree_dots = mn.VGroup()
+
+           # def angle_unit(angle):
+           #     return np.array([np.cos(angle*np.pi/180), np.sin(angle*np.pi/180), 0])
+
+           # labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
 
 
-            self.play(mn.Rotate(whole_tree, angle=-np.pi, about_point=mn.ORIGIN))
-            self.end_fragment()
+           # tree_verts.add(mn.Dot(mn.ORIGIN, z_index=1))
+           # tree_verts.add(mn.Dot(mn.LEFT, z_index=1), mn.Dot(mn.RIGHT, z_index=1))
+           # tree_verts.add(mn.Dot(mn.LEFT + angle_unit(140), z_index=1), mn.Dot(mn.LEFT + angle_unit(220), z_index=1))
+           # tree_verts.add(mn.Dot(mn.RIGHT + angle_unit(40), z_index=1), mn.Dot(mn.RIGHT + angle_unit(320), z_index=1))
+           # tree_verts.add(mn.Dot(tree_verts[3].get_center() + angle_unit(140), z_index=1), mn.Dot(tree_verts[4].get_center() + angle_unit(220), z_index=1))
+           # tree_verts.add(mn.Dot(tree_verts[5].get_center() + angle_unit(40), z_index=1), mn.Dot(tree_verts[6].get_center() + angle_unit(320), z_index=1))
+
+
+
+           # tree_edges.add(bez_edge(tree_verts[0], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #0
+           # tree_edges.add(bez_edge(tree_verts[0], tree_verts[2], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #1
+           # tree_edges.add(bez_edge(tree_verts[1], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #2
+           # tree_edges.add(bez_edge(tree_verts[2], tree_verts[0], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #3
+           # tree_edges.add(bez_edge(tree_verts[1], tree_verts[3], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #4
+           # tree_edges.add(bez_edge(tree_verts[1], tree_verts[4], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #5
+           # tree_edges.add(bez_edge(tree_verts[3], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #6
+           # tree_edges.add(bez_edge(tree_verts[4], tree_verts[1], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #7
+           # tree_edges.add(bez_edge(tree_verts[2], tree_verts[5], mn.RED, mn.UP, labels[3], label_scale=0.33, shift_label=0.125))     #8
+           # tree_edges.add(bez_edge(tree_verts[2], tree_verts[6], mn.RED, mn.UP, labels[4], label_scale=0.33, shift_label=0.125))     #9
+           # tree_edges.add(bez_edge(tree_verts[5], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #10
+           # tree_edges.add(bez_edge(tree_verts[6], tree_verts[2], mn.BLUE, mn.UP, labels[0], label_scale=0.33, shift_label=0.125))    #11
+           # tree_edges.add(bez_edge(tree_verts[3], tree_verts[7], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #12
+           # tree_edges.add(bez_edge(tree_verts[7], tree_verts[3], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #13
+           # tree_edges.add(bez_edge(tree_verts[4], tree_verts[8], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #14
+           # tree_edges.add(bez_edge(tree_verts[8], tree_verts[4], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #15
+           # tree_edges.add(bez_edge(tree_verts[5], tree_verts[9], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))    #16
+           # tree_edges.add(bez_edge(tree_verts[9], tree_verts[5], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))     #17
+           # tree_edges.add(bez_edge(tree_verts[6], tree_verts[10], mn.BLUE, mn.UP, labels[1], label_scale=0.33, shift_label=0.125))   #18
+           # tree_edges.add(bez_edge(tree_verts[10], tree_verts[6], mn.RED, mn.UP, labels[2], label_scale=0.33, shift_label=0.125))    #19
+
+           # for start, end in zip(tree_verts[3:7], tree_verts[7:11]):
+           #     line_dir = end.get_center() - start.get_center()
+           #     dots = mn.Text("\u22ef")
+           #     angle = np.arctan2(line_dir[1], line_dir[0])
+           #     dots.rotate(angle + np.pi)
+           #     buffer = 0.5*(mn.RIGHT*np.cos(angle) + mn.UP*np.sin(angle))
+           #     dots.move_to(end.get_center() + buffer)
+           #     tree_dots.add(dots)
+
+           # whole_tree = mn.VGroup(tree_verts, tree_edges, tree_dots)
+           # whole_tree.scale(1.5)
+
+           # # Creating the tree animation
+           # lad_edge_1 = new_lad_edges[0]
+           # lad_edge_2 = new_lad_edges[1]
+
+           # self.play(mn.Indicate(new_lad_dots[0]))
+           # self.end_fragment()
+           # self.play(mn.Create(tree_verts[0]))
+           # self.end_fragment()
+           # self.play(mn.Indicate(lad_edge_1))
+           # self.end_fragment()
+           # self.play(mn.Create(tree_edges[0]), mn.Create(tree_edges[1]), mn.Create(tree_verts[1]), mn.Create(tree_verts[2]))
+           # self.end_fragment()
+           # self.play(mn.Indicate(lad_edge_2))
+           # self.end_fragment()
+           # self.play(mn.Create(tree_edges[2]), mn.Create(tree_edges[3]))
+           # self.end_fragment()
+           # self.play(*[mn.Create(tree_edges[i]) for i in {4, 5, 8, 9}], *[mn.Create(tree_verts[i]) for i in range (3, 7)])
+           # self.end_fragment()
+           # self.play(mn.Indicate(lad_edge_1))
+           # self.end_fragment()
+           # self.play(*[mn.Create(tree_edges[i]) for i in {6, 7, 10, 11}])
+           # self.end_fragment()
+           # self.play(*[mn.Create(tree_edges[i]) for i in range(12, 20)], *[mn.Create(tree_verts[i]) for i in range(7, 11)], *[mn.Write(d) for d in tree_dots])
+           # self.end_fragment()
+
+           # # Coloured path
+           # #col_path_grp = mn.VGroup(tree_edges[0].copy(), tree_edges[4].copy(), tree_edges[12].copy())
+
+
+           # #self.play(col_path_grp.animate.set_color(mn.YELLOW))
+           # #self.end_fragment()
+
+           # #self.play(mn.Indicate(tree_verts[7]))
+           # #self.end_fragment()
+
+           # #self.play(mn.FadeOut(col_path_grp))
+           # #self.end_fragment()
+
+           # # Show aut
+           # self.play(mn.Indicate(tree_verts[0]), mn.Indicate(tree_edges[0]), mn.Indicate(tree_edges[1]))
+           # self.end_fragment()
+           # self.play(mn.Indicate(new_lad_dot_labels[0]))
+           # self.end_fragment()
+
+
+           # self.play(mn.Rotate(whole_tree, angle=-np.pi, about_point=mn.ORIGIN))
+           # self.end_fragment()
 
             whole_scene = mn.Group(*[obj for obj in self.mobjects])
 
