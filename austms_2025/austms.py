@@ -77,13 +77,12 @@ class IntroScene(PresentationScene):
         if "Intro" in sections:
             title = mn.Tex("Determining Properties of (P)-closed Groups Acting On Trees \\\\ Using Local Action Diagrams", font_size=48).shift(mn.UP)
             author = mn.Tex("Marcus Chijoff", font_size=32).next_to(title, mn.DOWN, 1)
-            sup = mn.Tex("Supervisors: Michal Ferov and Stephan Tornier", font_size=35).next_to(title, mn.DOWN, 1)
+            sup = mn.Tex("Supervisors: Michal Ferov and Stephan Tornier", font_size=35).next_to(author, mn.DOWN, 1)
             uni = mn.Tex("The University of Newcastle", font_size=26).next_to(sup, mn.DOWN, 1)
             self.add(title, author, sup, uni)
             self.end_fragment()
 
             self.remove(title, author, sup, uni)
-            self.end_fragment()
 
             props = [mn.Tex(t) for t in ["Discreteness", "Scale Values", "Uniscalarity", "Unimodularity"]]
 
@@ -247,7 +246,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(mn.FadeOut(tree, shift=mn.UP))
-            self.end_fragment()
 
         ##################################
         ## Local Action Diagram Section ##
@@ -682,7 +680,6 @@ class IntroScene(PresentationScene):
             whole_scene = mn.Group(*[obj for obj in self.mobjects])
 
             self.play(mn.ShrinkToCenter(whole_scene))
-            self.end_fragment()
 
         #################
         ## Group Types ##
@@ -784,7 +781,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(mn.FadeOut(flow, shift=mn.DOWN))
-            self.end_fragment()
 
         ##############
         ## Discrete ##
@@ -900,7 +896,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(mn.FadeOut(tree, shift=mn.UP))
-            self.end_fragment()
 
             # Discrete Theorem 
 
@@ -923,7 +918,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(mn.FadeOut(disc_thm, shift=mn.UP))
-            self.end_fragment()
 
 
         #############
@@ -1054,7 +1048,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(scale_value.animate.shift(2.5*mn.UP))
-            self.end_fragment()
 
 
             labels = [mn.MathTex(f"{i}") for i in range(1, 6)]
@@ -1128,7 +1121,6 @@ class IntroScene(PresentationScene):
 
             self.play(mn.FadeIn(pict_ul_rect_2, shift=mn.UP))
             self.remove(*self.mobjects)
-            self.end_fragment()
 
         if "Uniscalar" in sections:
             title = mn.Tex("Uniscalarity")
@@ -1178,19 +1170,19 @@ class IntroScene(PresentationScene):
             self.play(mn.ReplacementTransform(title, lad))
             self.end_fragment()
 
-            self.play(mn.Indicate(circle), *[mn.Indicate(pt) for pt in pts])
-            self.end_fragment()
+            #self.play(mn.Indicate(circle), *[mn.Indicate(pt) for pt in pts])
+            #self.end_fragment()
 
-            self.play(*[mn.Indicate(pt) for pt in pts2],
-                      *[mn.Indicate(pt) for pt in pts3],
-                      *[mn.Indicate(pt) for pt in pts4],
-                      *[mn.Indicate(pt) for pt in pts5],
-                      *[mn.Indicate(pt) for pt in pts6],
-                      *[mn.Indicate(line) for line in lines],
-                      *[mn.Indicate(pt) for pt in extra_pts],
-                      *[mn.Indicate(line) for line in extra_lines]
-                     )
-            self.end_fragment()
+            #self.play(*[mn.Indicate(pt) for pt in pts2],
+            #          *[mn.Indicate(pt) for pt in pts3],
+            #          *[mn.Indicate(pt) for pt in pts4],
+            #          *[mn.Indicate(pt) for pt in pts5],
+            #          *[mn.Indicate(pt) for pt in pts6],
+            #          *[mn.Indicate(line) for line in lines],
+            #          *[mn.Indicate(pt) for pt in extra_pts],
+            #          *[mn.Indicate(line) for line in extra_lines]
+            #         )
+            #self.end_fragment()
 
             axis1 = [mn.Dot(i*mn.UP) for i in range(-8, 9)] # Translation
             axis2 = [mn.Dot(i*mn.RIGHT) for i in range(-8, 9)] # Translation
@@ -1249,7 +1241,6 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(mn.FadeOut(tree, shift=mn.UP))
-            self.end_fragment()
 
 
         if "Unimodular" in sections:
@@ -1330,7 +1321,6 @@ class IntroScene(PresentationScene):
             grp = mn.Group(img, circ)
 
             self.play(mn.FadeOut(grp, shift=mn.UP))
-            self.end_fragment()
 
             dot1 = mn.Dot(3*mn.UP + 6*mn.LEFT, z_index=1)
             dot2 = mn.Dot(3*mn.UP + 3*mn.LEFT, z_index=1)
@@ -1434,4 +1424,7 @@ class IntroScene(PresentationScene):
                 animations.append(mn.Restore(e))
 
             self.play(*animations, mn.Uncreate(e1), mn.Uncreate(e1r))
+            self.end_fragment()
+
+            self.play(mn.FadeOut(lad))
             self.end_fragment()
