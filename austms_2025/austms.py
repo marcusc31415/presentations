@@ -15,6 +15,7 @@ sections.append("Discrete")
 sections.append("Scale")
 sections.append("Uniscalar")
 sections.append("Unimodular")
+sections.append("Ending")
 
 def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48, align="justifying"):  
     template = mn.TexTemplate()
@@ -687,7 +688,7 @@ class IntroScene(PresentationScene):
 
         if "Types" in sections:
             _type_name = ["Fixed Vertex", "Edge Inversion", "Lineal", "Horocyclic", "Focal", "General Type"]
-            _type_example = [r"\operatorname{Aut}(T)_{v}", r"\operatorname{Aut}(T)_{\{a, \overline{a}\}}", r"\operatorname{Aut}(T)_{\xi, \xi'}", r"\operatorname{Aut}(T)_{\xi} \cong \mathbb{Z} \ltimes H", r"\operatorname{Aut}(T)_{\xi}", r"\operatorname{Aut}(T)"]
+            _type_example = [r"\operatorname{Aut}(T_3)_{v}", r"\operatorname{Aut}(T_3)_{\{a, \overline{a}\}}", r"\operatorname{Aut}(T_3)_{\xi, \xi'}", r"\operatorname{Aut}(T_3)_{\xi} \cong \mathbb{Z} \ltimes H", r"\operatorname{Aut}(T_3)_{\xi}", r"\operatorname{Aut}(T_3)"]
 
             type_name = [mn.Tex(t, font_size=60) for t in _type_name]
             type_example = []
@@ -776,6 +777,7 @@ class IntroScene(PresentationScene):
             for pos in positions:
                 self.play(flow.animate.move_to(-1*pos))
                 self.end_fragment()
+
 
             self.play(flow.animate.scale(0.25).move_to(mn.ORIGIN))
             self.end_fragment()
@@ -1428,3 +1430,31 @@ class IntroScene(PresentationScene):
 
             self.play(mn.FadeOut(lad))
             self.end_fragment()
+
+
+        if "Ending" in sections:
+
+            man = mn.Text("Manim").scale(1.5)
+            m_a = mn.Text("3Blue1Brown").scale(1.5)
+            js = mn.Text("Reveal JS").scale(1.5)
+            beamer = mn.Text("\"Can\'t even use Beamer.\"").scale(1.5)
+
+            self.play(mn.Write(man))
+            self.end_fragment()
+            self.play(mn.ReplacementTransform(man, m_a))
+            self.end_fragment()
+            self.play(mn.ReplacementTransform(m_a, js))
+            self.end_fragment()
+            self.play(mn.ReplacementTransform(js, beamer))
+            self.end_fragment()
+
+            lego = mn.ImageMobject("lego.png")
+
+            self.play(mn.FadeOut(beamer, shift=mn.UP), mn.FadeIn(lego, shift=mn.UP))
+            self.end_fragment()
+
+            self.play(mn.FadeOut(lego, shift=mn.UP))
+            self.end_fragment()
+
+
+
