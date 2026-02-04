@@ -1441,11 +1441,11 @@ class IntroScene(PresentationScene):
             i = 0
             for v1, v2 in zip(verts[:-1], verts[1:]):
                 if i % 2 == 0:
-                    edges.append(_bez_edge(v1, v2, mn.BLUE, mn.DOWN, 0))
+                    edges.append(_bez_edge(v1, v2, mn.BLUE, mn.UP, 0))
                     edges.append(_bez_edge(v2, v1, mn.RED, mn.UP, 2))
                 else:
                     edges.append(_bez_edge(v1, v2, mn.BLUE, mn.UP, 1))
-                    edges.append(_bez_edge(v2, v1, mn.RED, mn.DOWN, 3))
+                    edges.append(_bez_edge(v2, v1, mn.RED, mn.UP, 3))
                 i += 1
 
             self.play(*[mn.Create(v) for v in verts], *[mn.GrowFromCenter(e) for e in edges])
