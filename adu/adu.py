@@ -10,11 +10,11 @@ sections = []
 #sections.append("Intro")
 #sections.append("Property P")
 #sections.append("LAD")
-sections.append("Types")
+#sections.append("Types")
 #sections.append("Discrete")
 #sections.append("Scale")
 #sections.append("Uniscalar")
-#sections.append("Unimodular")
+sections.append("Unimodular")
 #sections.append("Ending")
 
 def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48, align="justifying"):  
@@ -731,6 +731,7 @@ class IntroScene(PresentationScene):
             whole_scene = mn.Group(*[obj for obj in self.mobjects])
 
             self.play(mn.ShrinkToCenter(whole_scene))
+            self.end_framgment()
 
         #################
         ## Group Types ##
@@ -847,154 +848,31 @@ class IntroScene(PresentationScene):
 
             self.play(mn.FadeOut(flow, shift=mn.DOWN))
 
-        ##############
-        ## Discrete ##
-        ##############
-
-        if "Discrete" in sections:
-            title = mn.Tex("Discreteness")
-
-            self.add(title)
-            self.end_fragment()
-
-            circle = mn.Circle(radius=1)
-
-            pt_angle = [t*2*np.pi for t in [0.2909, 0.4161, 0.6016, 0.8672, 0.9812]]
-
-            pts = [mn.Dot(point=np.array([np.cos(t), np.sin(t), 0]), color=mn.RED, z_index=1) for t in pt_angle]
-            pts2 = [mn.Dot(point=np.array([2*np.cos(t), 2*np.sin(t), 0])) for t in pt_angle]
-            pts3 = [mn.Dot(point=np.array([3*np.cos(t), 3*np.sin(t), 0])) for t in pt_angle[1:2]+pt_angle[3:5]]
-            pts4 = [mn.Dot(point=np.array([4*np.cos(t), 4*np.sin(t), 0])) for t in pt_angle[3:5]]
-            pts5 = [mn.Dot(point=np.array([5*np.cos(t), 5*np.sin(t), 0])) for t in pt_angle[3:5]]
-            pts6 = [mn.Dot(point=np.array([6*np.cos(t), 6*np.sin(t), 0])) for t in pt_angle[3:5]]
-
-
-            lines = [
-                mn.Line(start=pts[0].get_center(), end=pts2[0].get_center()), # First angle
-                mn.Line(start=pts[1].get_center(), end=pts2[1].get_center()), # Second angle
-                mn.Line(start=pts2[1].get_center(), end=pts3[0].get_center()), # Second angle
-                mn.Line(start=pts[2].get_center(), end=pts2[2].get_center()), # Third angle
-                mn.Line(start=pts[3].get_center(), end=pts2[3].get_center()), # Fourth angle
-                mn.Line(start=pts2[3].get_center(), end=pts3[1].get_center()), # Fourth angle
-                mn.Line(start=pts3[1].get_center(), end=pts4[0].get_center()), # Fourth angle
-                mn.Line(start=pts4[0].get_center(), end=pts5[0].get_center()), # Fourth angle
-                mn.Line(start=pts5[0].get_center(), end=pts6[0].get_center()), # Fourth angle
-                mn.Line(start=pts[4].get_center(), end=pts2[4].get_center()), # Fifth angle
-                mn.Line(start=pts2[4].get_center(), end=pts3[2].get_center()), # Fifth angle
-                mn.Line(start=pts3[2].get_center(), end=pts4[1].get_center()), # Fifth angle
-                mn.Line(start=pts4[1].get_center(), end=pts5[1].get_center()), # Fifth angle
-                mn.Line(start=pts5[1].get_center(), end=pts6[1].get_center()), # Fourth angle
-
-            ]
-
-            extra_pts = [mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] + 0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] + 0.76), 0])),
-                         mn.Dot(point=np.array([3*np.cos(pt_angle[1]) + np.cos(pt_angle[1] -  0.76), 3*np.sin(pt_angle[1]) + np.sin(pt_angle[1] - 0.76), 0])),
-                        ]
-
-            extra_lines = [mn.Line(start=pts3[0].get_center(), end=extra_pts[0].get_center()), mn.Line(start=pts3[0].get_center(), end=extra_pts[1].get_center())]
-
-
-            lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines, *extra_pts, *extra_lines)
-
-            self.play(mn.ReplacementTransform(title, lad))
-            self.end_fragment()
-
-            self.play(mn.Indicate(circle), *[mn.Indicate(pt) for pt in pts])
-            self.end_fragment()
-
-            self.play(*[mn.Indicate(pt) for pt in pts2],
-                      *[mn.Indicate(pt) for pt in pts3],
-                      *[mn.Indicate(pt) for pt in pts4],
-                      *[mn.Indicate(pt) for pt in pts5],
-                      *[mn.Indicate(pt) for pt in pts6],
-                      *[mn.Indicate(line) for line in lines],
-                      *[mn.Indicate(pt) for pt in extra_pts],
-                      *[mn.Indicate(line) for line in extra_lines]
-                     )
-            self.end_fragment()
-
-            axis1 = [mn.Dot(i*mn.UP) for i in range(-8, 9)] # Translation
-            axis2 = [mn.Dot(i*mn.RIGHT) for i in range(-8, 9)] # Translation
-            axis3 = [mn.Dot(i*mn.UP + 4*mn.RIGHT) for i in range(-8, 9)]
-            axis4 = [mn.Dot(i*mn.UP + 5*mn.RIGHT) for i in range(-8, 9)]
-            axis5 = [mn.Dot(i*mn.UP + -3*mn.RIGHT) for i in range(-8, 9)]
-            axis6 = [mn.Dot(i*mn.UP + -4*mn.RIGHT) for i in range(-8, 9)]
-
-            points = [mn.Dot(mn.UP + mn.LEFT), mn.Dot(2*mn.UP + mn.LEFT),
-                      mn.Dot(2*mn.UP + 2*mn.LEFT), mn.Dot(3*mn.UP + mn.LEFT)]
-
-            lines1 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis1[:-1], axis1[1:])]
-            lines2 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis2[:-1], axis2[1:])]
-            lines3 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis3[:-1], axis3[1:])]
-            lines4 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis4[:-1], axis4[1:])]
-            lines5 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis5[:-1], axis5[1:])]
-            lines6 = [mn.Line(start=pt1.get_center(), end=pt2.get_center()) for pt1, pt2 in zip(axis6[:-1], axis6[1:])]
-
-            lines_other = [mn.Line(start=mn.UP, end=mn.UP+mn.LEFT), mn.Line(start=2*mn.UP, end=2*mn.UP + mn.LEFT),
-                           mn.Line(start=2*mn.UP+mn.LEFT, end=2*(mn.UP+mn.LEFT)), mn.Line(start=3*mn.UP, end=3*mn.UP+mn.LEFT)]
-
-            a1 = mn.VGroup(*axis1, lines1)
-            a2 = mn.VGroup(*axis2, lines2)
-            a3 = mn.VGroup(*axis3, lines3)
-            a4 = mn.VGroup(*axis4, lines4)
-            a5 = mn.VGroup(*axis5, lines5)
-            a6 = mn.VGroup(*axis6, lines6)
-            other = mn.VGroup(*points, *lines_other)
-
-            a1.set_color(mn.RED)
-            a2.set_color(mn.RED)
-            a1.set_z_index(5)
-            a2.set_z_index(5)
-
-            # Add extra stuff to the tree. 
-
-            d1 = mn.Dot(3*mn.UP + 2*mn.LEFT)
-            d2 = mn.Dot(1*mn.UP + 2*mn.LEFT)
-            l1 = mn.Line(start=2*(mn.UP+mn.LEFT), end=3*mn.UP+2*mn.LEFT)
-            l2 = mn.Line(start=2*(mn.UP+mn.LEFT), end=1*mn.UP+2*mn.LEFT)
-
-
-
-            tree = mn.VGroup(*a1, *a2, *a3, *a4, *a5, *a6, *other, d1, d2, l1, l2)
-
-            self.play(mn.ReplacementTransform(lad, tree))
-            self.end_fragment()
-
-            self.play(mn.FadeOut(tree, shift=mn.UP))
-
-            # Discrete Theorem 
-
-            disc_thm = create_paragraph(r'''
-                Let $\Delta = (\Gamma, (X_{a}), (G(v)))$ be a local action diagram, $\mathbf T = (T, \pi, L)$ be a $\Delta$-tree, and $G:=\mathbf U(\mathbf{T},(G(v)))\leq\operatorname{Aut}_{\pi}(T)$. If $G$ is of type
-                \begin{description}
-                    \item[(Fixed vertex)] then $G$ is discrete if and only if $G(v)$ is trivial for almost all $v\in V\Gamma$, and whenever $X_{v}$ ($v\in V\Gamma$) is infinite then $G(v)$ has a finite base and $G(u)$ is trivial for every $u\in V\Gamma$ such that the arc $a\in o^{-1}(v)$ oriented towards $u$ has an infinite colour set.
-                    \item[(Inversion)] then $G$ is discrete if and only if $G(v)$ is trivial for almost all $v\in V\Gamma$, and whenever $X_{v}$ ($v\in V\Gamma$) is infinite then $G(v)$ has a finite base and $G(u)$ is trivial for every $u\in V\Gamma$ such that the arc $a\in o^{-1}(v)$ oriented towards $u$ has an infinite colour set.
-                    \item[(Lineal)] then $G$ is discrete if and only if $G(v)$ is trivial for all $v\in V\Gamma$.
-                    \item[(Horocyclic)] then $G$ is non-discrete.
-                    \item[(Focal)] then $G$ is non-discrete.
-                    \item[(General)] then $G$ is discrete if and only if $G(v)$ is semiregular for all $v\in V\Gamma'$ and trivial otherwise, where $\Gamma'$ is the unique smallest cotree of $\Delta$.
-                \end{description}
-            ''', font_size=23)[0]
-
-            self.add(disc_thm)
-            self.end_fragment()
-
-            self.play(disc_thm[1][625:].animate.set_color(mn.YELLOW))
-            self.end_fragment()
-
-            self.play(mn.FadeOut(disc_thm, shift=mn.UP))
-
-
         #############
         ### Scale ###
         #############
 
         if "Scale" in sections:
-            title = mn.Tex("Scale Values")
+            title = mn.Tex("Scale Values", font_size=72)
+
+            b_list = blist(r"The scale function was defined by G. Willis in [Wil94].",
+                           r"It is defined for all totally disconnected locally compact groups.",
+                           r"We show how to compute the scale for \textbf{translations} in a (P)-closed group."
+                          )
+
             self.add(title)
             self.end_fragment()
 
-            
+            self.play(title.animate.move_to(3*mn.UP))
+            self.add(b_list[1])
+            self.end_fragment()
+
+            for i in [2, 3]:
+                self.add(b_list[i])
+                self.end_fragment()
+
+            self.play(mn.ShrinkToCenter(mn.VGroup(title, b_list)))
+
             ### Scale Visualisation ###
             # Display the group in the centre. 
             circle_1 = mn.Circle(radius=3, color=mn.PURE_GREEN, stroke_color=mn.WHITE, fill_opacity=0.6)
@@ -1188,9 +1066,31 @@ class IntroScene(PresentationScene):
             self.remove(*self.mobjects)
 
         if "Uniscalar" in sections:
-            title = mn.Tex("Uniscalarity")
+            title = mn.Tex("Uniscalarity", font_size=72)
+            b_list = blist(r"A group is uniscalar if the scale of every element is 1.",
+                           r"A uniscalar group is ``very close'' to being discrete without necessarily being discrete.",
+                           r"For (P)-closed groups with compact-open vertex stabilisers, we use our formula to show when they are uniscalar."
+                          )
+
             self.add(title)
             self.end_fragment()
+
+            self.play(title.animate.move_to(3*mn.UP))
+            self.add(b_list[1])
+            self.end_fragment()
+
+            for i in [2, 3]:
+                self.add(b_list[i])
+                self.end_fragment()
+
+            uniscalar_thm = create_paragraph(r"\textbf{Theorem} (Chijoff-Ferov-Tornier): ",  r"Let $G$ be a (P)-closed group. Then $G$ is uniscalar if and only if $G$ is either of type Horocyclic or contains a compact open normal subgroup.")[0]
+
+            uniscalar_thm[1].set_color(mn.YELLOW)
+
+            self.play(mn.ReplacementTransform(mn.VGroup(title, b_list), uniscalar_thm))
+            self.end_fragment()
+
+
 
             circle = mn.Circle(radius=1)
 
@@ -1231,8 +1131,7 @@ class IntroScene(PresentationScene):
 
             lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines, *extra_pts, *extra_lines)
 
-
-            self.play(mn.ReplacementTransform(title, lad))
+            self.play(mn.ReplacementTransform(uniscalar_thm, lad))
             self.end_fragment()
 
             #self.play(mn.Indicate(circle), *[mn.Indicate(pt) for pt in pts])
@@ -1309,18 +1208,33 @@ class IntroScene(PresentationScene):
 
 
         if "Unimodular" in sections:
-            title = mn.Tex("Unimodularity")
+            title = mn.Tex("Unimodularity", font_size=72)
+            b_list = blist(r"A group is unimodular if the modular function has a value of 1 for every element.\vspace{-10pt}",
+                           r"In a totally disconnected locally compact group we have that $\Delta(g) = \frac{s(g)}{s(g^{-1})}$\vspace{-10pt}.",
+                           r"For a group with compact-open vertex stabilisers, a unimodularity condition was derived by Bass-Kulkarni in [BK90]\vspace{-10pt}.",
+                           r"For (P)-closed groups, the same condition can be found by using our formula for the scale function.\vspace{-10pt}", font_size=40
+                          )
+
+            unimod_thm = create_paragraph(r"\textbf{Theorem} (Bass-Kulkarni): ",  r"Let $G$ be a (P)-closed group and $\Delta = (\Gamma, (X_a), (G(v)))$ its associated local action diagram. Then $G$ is unimodular if and only if for all cycles $C$ in $\Gamma$ we have that $\prod_{a \in C}|X_a| = \prod_{a \in C}|X_{\overline{a}}|$.")[0]
+
+            unimod_thm[1].set_color(mn.YELLOW)
+
+
+
             self.add(title)
             self.end_fragment()
 
-            mod_func = mn.MathTex(r"\Delta(g) = \frac{s(g)}{s(g^{-1})}")
-
-            self.play(mn.ReplacementTransform(title, mod_func))
+            self.play(title.animate.move_to(3*mn.UP))
+            b_list.next_to(title, mn.DOWN, 0.5)
+            self.add(b_list[1])
             self.end_fragment()
 
-            scale_eq = mn.MathTex(r"s(g) = s(g^{-1})")
+            for i in [2, 3, 4]:
+                self.add(b_list[i])
+                self.end_fragment()
 
-            self.play(mn.ReplacementTransform(mod_func, scale_eq))
+
+            self.play(mn.ReplacementTransform(mn.VGroup(title, b_list), unimod_thm))
             self.end_fragment()
 
             dot1 = mn.Dot(2*mn.UP + 2*mn.LEFT, z_index=1)
@@ -1340,7 +1254,7 @@ class IntroScene(PresentationScene):
 
             lad = mn.VGroup(dot1, dot2, dot3, dot4, e1, e2, e3, e4, e1r, e2r, e3r, e4r)
 
-            self.play(mn.ReplacementTransform(scale_eq, lad))
+            self.play(mn.ReplacementTransform(unimod_thm, lad))
             self.end_fragment()
 
             e1 = bez_edge(dot1, dot2, mn.RED, mn.UP, label=mn.MathTex(r"\{1, 2\}"))
