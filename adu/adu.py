@@ -7,15 +7,15 @@ mn.config.disable_caching=False
 mn.config.flush_cache=False
 
 sections = []
-#sections.append("Intro")
-#sections.append("Property P")
-#sections.append("LAD")
-#sections.append("Types")
-#sections.append("Discrete")
-#sections.append("Scale")
-#sections.append("Uniscalar")
+sections.append("Intro")
+sections.append("Property P")
+sections.append("LAD")
+sections.append("Types")
+sections.append("Scale")
+sections.append("Uniscalar")
 sections.append("Unimodular")
-#sections.append("Ending")
+sections.append("Future Work")
+sections.append("Ending")
 
 def create_paragraph(*text, title="blah", paragraph_width_in_cm=9, font_size=48, align="justifying"):  
     template = mn.TexTemplate()
@@ -731,7 +731,7 @@ class IntroScene(PresentationScene):
             whole_scene = mn.Group(*[obj for obj in self.mobjects])
 
             self.play(mn.ShrinkToCenter(whole_scene))
-            self.end_framgment()
+            self.end_fragment()
 
         #################
         ## Group Types ##
@@ -1408,13 +1408,113 @@ class IntroScene(PresentationScene):
             self.play(mn.FadeOut(lad))
             self.end_fragment()
 
+        if "Future Work" in sections:
+            title = mn.Tex("Future Work", font_size=72)
+
+            b_list = blist(r"Our formula finds the scale of translations.",
+                           r"This is enough is the group has compact vertex stabilisers.",
+                           r"If the group doesn't have compact vertex stabilisers, our formula for translations still works using Reid-Smith's theorem for local compactness [RS26].",
+                          )
+
+            b_list_2 = blist(r"We have extended Reid-Smith's theorem for local compactness to work in all cases.",
+                           r"Using this, we can find the scale values of non-translations.",
+                           r"This depends on the scale of elements in the local-action groups."
+                          )
+
+
+
+            self.add(title)
+            self.end_fragment()
+
+            scale_title = mn.Tex("Scale of Non-translations", font_size=72).move_to(mn.UP)
+            lp_title = mn.Tex("Locally Determined Properties", font_size=72).move_to(mn.DOWN)
+
+            self.play(mn.ReplacementTransform(title, mn.VGroup(scale_title, lp_title)))
+            self.end_fragment()
+
+            a_group = mn.AnimationGroup(
+                        mn.ShrinkToCenter(lp_title),
+                        scale_title.animate.move_to(3*mn.UP)
+                    )
+
+
+            self.play(a_group)
+            self.add(b_list[1])
+            self.end_fragment()
+
+            for i in [2, 3]:
+                self.add(b_list[i])
+                self.end_fragment()
+
+            first_group = mn.VGroup(scale_title, b_list)
+
+            self.play(first_group.animate.shift(4*mn.UP))
+
+            b_list_2.next_to(b_list, mn.DOWN, 0.60+np.linalg.norm(b_list[2].get_bottom()-b_list[3].get_top()))
+
+            for i in [1, 2, 3]:
+                self.add(b_list_2[i])
+                self.end_fragment()
+
+            lp_title = mn.Tex("Locally Determined Properties", font_size=72).move_to(3*mn.UP)
+
+            self.play(mn.ReplacementTransform(mn.VGroup(scale_title, b_list, b_list_2), lp_title))
+            self.end_fragment()
+
+            b_list = blist(r"A property is locally determined when $G$ satisfies that property if and only if $G^{(P)}$ satisfies it.",
+                           r"The type of group action is an example of such a property [CT23].",
+                           r"Uniscalarity is an example of a property which is not locally determined."
+                          )
+
+            for i in [1, 2, 3]:
+                self.add(b_list[i])
+                self.end_fragment()
+
+            self.play(mn.FadeOut(mn.VGroup(lp_title, b_list), shift=mn.UP))
+            self.end_fragment()
+
+
 
         if "Ending" in sections:
+
+            bib = create_paragraph('''
+                        [BEW15] C. Banks, M. Elder, and G. Willis, Simple groups of automorphisms of trees deter- mined by their actions on finite subtrees, Journal of Group Theory 18 (2015), no. 2, 235–261.
+                        
+                        [BK90] H. Bass and R. Kulkarni, Uniform tree lattices, Journal of the American Mathematical Society 3 (1990), no. 4, 843–902.
+
+                        [CT24] M. Chijoff and S. Tornier, Discrete (P)-closed groups acting on trees, arXiv preprint 2409.13240 (2024).
+
+
+                        ''',
+                        '''[RS26] C. Reid and S. Smith, Groups acting on trees with Tits’ independence property (P): With an appendix by Stephan Tornier, Mathematische Annalen 395 (2026), no. 3, 53.
+
+                        ''',
+
+
+                        '''[Ser80] J.-P. Serre, Trees, Springer, 1980.
+
+                        [Tit70] J. Tits, Sur le groupe des automorphismes d’un arbre, Essays on topology and related topics, Springer, 1970, pp. 188–211.
+
+                        [Wil94] G. Willis, The structure of totally disconnected, locally compact groups, Mathematische Annalen 300 (1994), no. 1, 341–363.
+                    ''')[0]
+
+            bib.shift(2.5*mn.DOWN)
+
+            bib[2].set_color(mn.YELLOW)
+
+
 
             man = mn.Text("Manim").scale(1.5)
             m_a = mn.Text("3Blue1Brown").scale(1.5)
             js = mn.Text("Reveal JS").scale(1.5)
             beamer = mn.Text("\"Can\'t even use Beamer.\"").scale(1.5)
+
+            self.add(bib)
+            self.end_fragment()
+            self.play(bib.animate.shift(5.5*mn.UP))
+            self.end_fragment()
+            self.play(mn.FadeOut(bib, shift=mn.UP))
+            self.end_fragment()
 
             self.play(mn.Write(man))
             self.end_fragment()
@@ -1425,12 +1525,7 @@ class IntroScene(PresentationScene):
             self.play(mn.ReplacementTransform(js, beamer))
             self.end_fragment()
 
-            lego = mn.ImageMobject("lego.png")
-
-            self.play(mn.FadeOut(beamer, shift=mn.UP), mn.FadeIn(lego, shift=mn.UP))
-            self.end_fragment()
-
-            self.play(mn.FadeOut(lego, shift=mn.UP))
+            self.play(mn.FadeOut(beamer, shift=mn.UP))
             self.end_fragment()
 
 
