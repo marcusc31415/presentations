@@ -606,7 +606,7 @@
 
 
 				<section data-auto-animate data-auto-animate-restart>
-					<h4>Number (P)-closed Actions On <em>T<sub>d</sub></em> With <em>k</em> Orbits</h4>
+					<h4>Number (P)-closed Actions On <em>T<sub>d</sub> </em> With <em>k </em> Orbits</h4>
 					<table style="font-size:60%; text-align:center">
 						<thead>
 							<tr>
@@ -785,12 +785,11 @@
 						107
 					</code></pre>
 					<pre><code data-id="enumerate2 3" class="language-gap" data-trim data-line-numbers>
-						gap&gt; lad_list := OneLocalActionDiagram(\
-						&gt;                LocalActionDiagramIsUnimodular, true,\
-						&gt;                LocalActionDiagramIsUniscalar, false,\
-						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
-						&gt;                       = SymmetricGroup(3), true);
-						gap&gt; Size(lad_list);
+						gap&gt; lad := OneLocalActionDiagram(\
+						&gt;           LocalActionDiagramIsUnimodular, true,\
+						&gt;           LocalActionDiagramIsUniscalar, false,\
+						&gt;           lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                  = SymmetricGroup(3), true);
 					</code></pre>
 					<pre><code data-id="enumerate2 4" class="language-plaintext" data-trim>
 						&lt;Aut(T3) (as a Local Action Diagram)&gt;
