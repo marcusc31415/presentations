@@ -9,9 +9,11 @@
 		<link rel="stylesheet" href="../dist/reset.css"/>
 		<link rel="stylesheet" href="../dist/reveal.css"/>
 		<link rel="stylesheet" href="../dist/theme/dracula.css" id="theme"/>
+		<link rel="stylesheet" href="./ggw.css"/>
 
 		<!-- Theme used for syntax highlighted code -->
 		<link rel="stylesheet" href="../plugin/highlight/monokai.css"/>
+
 	</head>
 	<body>
 		<div class="reveal">
@@ -254,8 +256,9 @@
 
 
 				<section data-auto-animate data-auto-animate-restart>
-					<pre><code data-id="discrete2 1" class="language-gap" data-trim data-line-numbers="1-3|4-9|10-12|">
-						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4], [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
+					<pre><code data-id="discrete2 1" class="language-gap" data-trim data-line-numbers="1-4|5-10|11-13|">
+						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4],\
+						&gt;                 [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
 						gap&gt; rev := (1,2)(3,4)(5,6)(7,8)(9,10);
 						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
 						gap&gt; group := Group(());
@@ -271,7 +274,8 @@
 				</section>
 				<section data-auto-animate>
 					<pre><code data-id="discrete2 1" class="language-gap" data-trim data-line-numbers="1-4|5-10|11-13|">
-						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4], [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
+						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4],\
+						&gt;                 [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
 						gap&gt; rev := (1,2)(3,4)(5,6)(7,8)(9,10);
 						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
 						gap&gt; group := Group(());
@@ -290,7 +294,8 @@
 				</section>
 				<section data-auto-animate>
 					<pre><code data-id="discrete2 1" class="language-gap" data-trim data-line-numbers="1-4|5-10|11-13|">
-						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4], [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
+						gap&gt; adj_list := [[1, 2], [2, 1], [2, 3], [3, 2], [3, 4],\
+						&gt;                 [4, 3], [4, 1], [1, 4], [4, 5], [5, 4]];
 						gap&gt; rev := (1,2)(3,4)(5,6)(7,8)(9,10);
 						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
 						gap&gt; group := Group(());
@@ -313,14 +318,14 @@
 
 
 				<section data-auto-animate data-auto-animate-restart>
-					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers="1,2|">
+					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers>
 						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
 						&gt;           SymmetricGroup(100));
 						gap&gt; LocalActionDiagramIsDiscrete(lad)
 					</code></pre>
 				</section>
 				<section data-auto-animate>
-					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers="1,2|">
+					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers>
 						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
 						&gt;           SymmetricGroup(100));
 						gap&gt; LocalActionDiagramIsDiscrete(lad)
@@ -330,7 +335,7 @@
 					</code></pre>
 				</section>
 				<section data-auto-animate>
-					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers="1,2|">
+					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers>
 						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
 						&gt;           SymmetricGroup(100));
 						gap&gt; LocalActionDiagramIsDiscrete(lad)
@@ -345,7 +350,7 @@
 					</code></pre>
 				</section>
 				<section data-auto-animate>
-					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers="1,2|">
+					<pre><code data-id="discrete3 1" class="language-gap" data-trim data-line-numbers>
 						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
 						&gt;           SymmetricGroup(100));
 						gap&gt; LocalActionDiagramIsDiscrete(lad)
@@ -361,6 +366,439 @@
 					<pre><code data-id="discrete3 4" class="language-plaintext" data-trim>
 						true
 					</code></pre>
+				</section>
+
+				<section class="fv-background" fv-video="./videos/FourthScene.mp4" fv-playback-info="./videos/FourthScene.json" data-background-size="contain" data-background-color="black">
+				</section>
+
+				<section data-auto-animate data-auto-animate-restart>
+					<pre><code data-id="uniscalar 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1]];
+						gap&gt; rev := (2,3);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((2, 3));
+						gap&gt; SetPermGroupDomain(group_1, [1, 2, 3]);
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_2], [[1], [2, 3], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="uniscalar 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1]];
+						gap&gt; rev := (2,3);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((2, 3));
+						gap&gt; SetPermGroupDomain(group_1, [1, 2, 3]);
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_2], [[1], [2, 3], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+					<pre><code data-id="uniscalar 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+				</section>
+
+
+				<section data-auto-animate data-auto-animate-restart>
+					<pre><code data-id="uniscalar2 1" class="language-gap" data-trim data-line-numbers="|7,8|">
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1], [2, 3], [3, 2]];
+						gap&gt; rev := (2,3)(4,5);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((1,2)(3, 4));
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; group_3 := SymmetricGroup(1000);
+						gap&gt; SetPermGroupDomain(group_3, [1..1001]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_3, group_2], \
+						&gt;           [[1, 2], [3, 4], [1001], [1..1000], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="uniscalar2 1" class="language-gap" data-trim data-line-numbers="|7,8|">
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1], [2, 3], [3, 2]];
+						gap&gt; rev := (2,3)(4,5);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((1,2)(3, 4));
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; group_3 := SymmetricGroup(1000);
+						gap&gt; SetPermGroupDomain(group_3, [1..1001]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_3, group_2], \
+						&gt;           [[1, 2], [3, 4], [1001], [1..1000], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+					<pre><code data-id="uniscalar2 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="uniscalar2 1" class="language-gap" data-trim data-line-numbers="|7,8|">
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1], [2, 3], [3, 2]];
+						gap&gt; rev := (2,3)(4,5);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((1,2)(3, 4));
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; group_3 := SymmetricGroup(1000);
+						gap&gt; SetPermGroupDomain(group_3, [1..1001]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_3, group_2], \
+						&gt;           [[1, 2], [3, 4], [1001], [1..1000], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+					<pre><code data-id="uniscalar2 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="uniscalar2 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="uniscalar2 1" class="language-gap" data-trim data-line-numbers="|7,8|">
+						gap&gt; adj_list := [[1, 1], [1, 2], [2, 1], [2, 3], [3, 2]];
+						gap&gt; rev := (2,3)(4,5);
+						gap&gt; graph := RSGraphByAdjacencyList(adj_list, rev);
+						gap&gt; group_1 := Group((1,2)(3, 4));
+						gap&gt; group_2 := Group(());
+						gap&gt; SetPermGroupDomain(group_2, [1]);
+						gap&gt; group_3 := SymmetricGroup(1000);
+						gap&gt; SetPermGroupDomain(group_3, [1..1001]);
+						gap&gt; lad := LocalActionDiagramFromData(graph,\
+						&gt;           [group_1, group_3, group_2], \
+						&gt;           [[1, 2], [3, 4], [1001], [1..1000], [1]]);
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+					<pre><code data-id="uniscalar2 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="uniscalar2 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+					<pre><code data-id="uniscalar2 4" class="language-plaintext" data-trim>
+						false
+					</code></pre>
+				</section>
+
+
+				<section class="fv-background" fv-video="./videos/FifthScene.mp4" fv-playback-info="./videos/FifthScene.json" data-background-size="contain" data-background-color="black">
+				</section>
+
+
+				<section data-auto-animate data-auto-animate-restart>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="unimodular 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="unimodular 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 4" class="language-plaintext" data-trim>
+						false
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="unimodular 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 4" class="language-plaintext" data-trim>
+						false
+					</code></pre>
+					<pre><code data-id="unimodular 5" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="unimodular 1" class="language-gap" data-trim data-line-numbers="1,2|">
+						gap&gt; lad := LocalActionDiagramFromBurgerMozesUniversalGroup(\
+						&gt;           Group((1,2), (3,4)));
+						gap&gt; LocalActionDiagramIsUnimodular(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 2" class="language-plaintext" data-trim>
+						true
+					</code></pre>
+					<pre><code data-id="unimodular 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsDiscrete(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 4" class="language-plaintext" data-trim>
+						false
+					</code></pre>
+					<pre><code data-id="unimodular 5" class="language-gap" data-trim data-line-numbers>
+						gap&gt; LocalActionDiagramIsUniscalar(lad);
+					</code></pre>
+					<pre><code data-id="unimodular 6" class="language-plaintext" data-trim>
+						false
+					</code></pre>
+				</section>
+
+
+				<section class="fv-background" fv-video="./videos/SixthScene.mp4" fv-playback-info="./videos/SixthScene.json" data-background-size="contain" data-background-color="black">
+				</section>
+
+
+				<section data-auto-animate data-auto-animate-restart>
+					<pre><code data-id="enumerate 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := LocalActionDiagramFromLibrary(3, 1);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="enumerate 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := LocalActionDiagramFromLibrary(3, 1);
+					</code></pre>
+					<pre><code data-id="enumerate 2" class="language-plaintext" data-trim>
+                        [ &lt;U(A3) (as a Local Action Diagram)&gt;,
+                          &lt;Aut(T3) (as a Local Action Diagram)&gt;, 
+                          &lt;U(C2) (as a Local Action Diagram)&gt;, 
+                          &lt;Aut(T3)_omega (as a Local Action Diagram)&gt;, 
+                          &lt;U(1) (as a Local Action Diagram)&gt;, 
+                          &lt;Z * C2 (as a Local Action Diagram)&gt; ]
+					</code></pre>
+				</section>
+
+
+				<section data-auto-animate data-auto-animate-restart>
+					<h4>Number (P)-closed Actions On <em>T<sub>d</sub></em> With <em>k</em> Orbits</h4>
+					<table style="font-size:60%; text-align:center">
+						<thead>
+							<tr>
+								<th style="text-align: center"></th>
+								<th style="text-align: center">1</th>
+								<th style="text-align: center">2</th>
+								<th style="text-align: center">3</th>
+								<th style="text-align: center">4</th>
+								<th style="text-align: center">5</th>
+								<th style="text-align: center">6</th>
+								<th style="text-align: center">7</th>
+								<th style="text-align: center">8</th>
+								<th style="text-align: center">9</th>
+								<th style="text-align: center">10</th>
+								<th style="text-align: center">11</th>
+								<th style="text-align: center">12</th>
+								<th style="text-align: center">13</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th style="text-align: center">1</th>
+								<td style="text-align: center">1</td>
+								<td style="text-align: center">3</td>
+								<td style="text-align: center">6</td>
+								<td style="text-align: center">19</td>
+								<td style="text-align: center">40</td>
+								<td style="text-align: center">125</td>
+								<td style="text-align: center">285</td>
+								<td style="text-align: center">904</td>
+								<td style="text-align: center">2240</td>
+								<td style="text-align: center">7213</td>
+								<td style="text-align: center">19326</td>
+								<td style="text-align: center">68849</td>
+								<td style="text-align: center">199007</td>
+							</tr>
+							<tr>
+								<th style="text-align: center">2</th>
+								<td style="text-align: center">1</td>
+								<td style="text-align: center">4</td>
+								<td style="text-align: center">26</td>
+								<td style="text-align: center">200</td>
+								<td style="text-align: center">1449</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+							</tr>
+							<tr>
+								<th style="text-align: center">3</th>
+								<td style="text-align: center">0</td>
+								<td style="text-align: center">4</td>
+								<td style="text-align: center">78</td>
+								<td style="text-align: center">2494</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+							</tr>
+							<tr>
+								<th style="text-align: center">4</th>
+								<td style="text-align: center">0</td>
+								<td style="text-align: center">4</td>
+								<td style="text-align: center">356</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+							</tr>
+							<tr>
+								<th style="text-align: center">5</th>
+								<td style="text-align: center">0</td>
+								<td style="text-align: center">4</td>
+								<td style="text-align: center">1539</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+							</tr>
+							<tr>
+								<th style="text-align: center">6</th>
+								<td style="text-align: center">0</td>
+								<td style="text-align: center">4</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+								<td style="text-align: center">-</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+
+				<section data-auto-animate data-auto-animate-restart>
+					<pre><code data-id="enumerate2 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := AllLocalActionDiagrams(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="enumerate2 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := AllLocalActionDiagrams(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+					<pre><code data-id="enumerate2 2" class="language-plaintext" data-trim>
+						107
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="enumerate2 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := AllLocalActionDiagrams(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+					<pre><code data-id="enumerate2 2" class="language-plaintext" data-trim>
+						107
+					</code></pre>
+					<pre><code data-id="enumerate2 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := OneLocalActionDiagram(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+				</section>
+				<section data-auto-animate>
+					<pre><code data-id="enumerate2 1" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := AllLocalActionDiagrams(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+					<pre><code data-id="enumerate2 2" class="language-plaintext" data-trim>
+						107
+					</code></pre>
+					<pre><code data-id="enumerate2 3" class="language-gap" data-trim data-line-numbers>
+						gap&gt; lad_list := OneLocalActionDiagram(\
+						&gt;                LocalActionDiagramIsUnimodular, true,\
+						&gt;                LocalActionDiagramIsUniscalar, false,\
+						&gt;                lad -> LocalActionDiagramVertexLabels(lad).1\
+						&gt;                       = SymmetricGroup(3), true);
+						gap&gt; Size(lad_list);
+					</code></pre>
+					<pre><code data-id="enumerate2 4" class="language-plaintext" data-trim>
+						&lt;Aut(T3) (as a Local Action Diagram)&gt;
+					</code></pre>
+				</section>
+
+
+				<section class="fv-background" fv-video="./videos/SeventhScene.mp4" fv-playback-info="./videos/SeventhScene.json" data-background-size="contain" data-background-color="black">
 				</section>
 
 			</div>
@@ -419,3 +857,5 @@
 		</script>
 	</body>
 </html>
+
+

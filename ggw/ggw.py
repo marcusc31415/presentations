@@ -212,7 +212,7 @@ class FirstScene(PresentationScene):
             self.end_fragment()
 
             self.play(title.animate.move_to(3*mn.UP))
-            b_list = create_paragraph(item(r"First introduced by J. Tits in [Tit70]."), item(r"Generalised to a family of properties in [BEW15]."), item("They are ``independence\'\' properties."), font_size=42)[0].next_to(title, mn.DOWN, 1)
+            b_list = create_paragraph(item(r"First introduced by J. Tits in [Tit70] to find examples of simple groups acting on trees."), item(r"Generalised to a family of properties in [BEW15]."), item("They are ``independence\'\' properties."), font_size=42)[0].next_to(title, mn.DOWN, 1)
             self.add(b_list[1])
             self.end_fragment()
             self.add(b_list[2])
@@ -788,7 +788,7 @@ class SecondScene(PresentationScene):
             title = mn.Tex("Group Types", font_size=72)
             b_list = blist(r"It is ``well known'' the groups acting an trees can be split into six mutually exclusives types [Ser03], [RS26].",
                            r"Reid-Smith showed how these types can be detected from a local action diagram [RS26].",
-                           r"Chijoff-Tornier showed that the type of a group and the type of its (P)-closure are the same [CT26]."
+                           r"C.-Tornier showed that the type of a group and the type of its (P)-closure are the same [CT26]."
                           )
 
             self.add(title)
@@ -874,7 +874,7 @@ class ThirdScene(PresentationScene):
     def construct(self):
 
         title = mn.Tex("Discrete Groups", font_size=72)
-        b_list = blist(r"Chijoff-Tornier proved necessary and sufficient conditions for a (P)-closed group to be discrete [CT26]." ,
+        b_list = blist(r"C.-Tornier proved necessary and sufficient conditions for a (P)-closed group to be discrete [CT26]." ,
                        r"There is one conditions for each group type.",
                        r"We will focus on the lineal type."
                       )
@@ -995,12 +995,10 @@ class ThirdScene(PresentationScene):
 class FourthScene(PresentationScene):
     def construct(self):
 
-
         if "Uniscalar" in sections:
             title = mn.Tex("Uniscalarity", font_size=72)
             b_list = blist(r"A group is uniscalar if the scale of every element is 1.",
                            r"A uniscalar group is ``very close'' to being discrete without necessarily being discrete.",
-                           r"For (P)-closed groups with compact-open vertex stabilisers, we use our formula to show when they are uniscalar."
                           )
 
             self.add(title)
@@ -1010,17 +1008,9 @@ class FourthScene(PresentationScene):
             self.add(b_list[1])
             self.end_fragment()
 
-            for i in [2, 3]:
+            for i in [2]:
                 self.add(b_list[i])
                 self.end_fragment()
-
-            uniscalar_thm = create_paragraph(r"\textbf{Theorem} (Chijoff-Ferov-Tornier): ",  r"Let $G$ be a (P)-closed group. Then $G$ is uniscalar if and only if $G$ is either of type Horocyclic or contains a compact open normal subgroup.")[0]
-
-            uniscalar_thm[1].set_color(mn.YELLOW)
-
-            self.play(mn.ReplacementTransform(mn.VGroup(title, b_list), uniscalar_thm))
-            self.end_fragment()
-
 
 
             circle = mn.Circle(radius=1)
@@ -1062,7 +1052,7 @@ class FourthScene(PresentationScene):
 
             lad = mn.VGroup(circle, *pts, *pts2, *pts3, *pts4, *pts5, *pts6, *lines, *extra_pts, *extra_lines)
 
-            self.play(mn.ReplacementTransform(uniscalar_thm, lad))
+            self.play(mn.ReplacementTransform(mn.VGroup(title, b_list), lad))
             self.end_fragment()
 
             #self.play(mn.Indicate(circle), *[mn.Indicate(pt) for pt in pts])
@@ -1137,18 +1127,25 @@ class FourthScene(PresentationScene):
 
             self.play(mn.FadeOut(tree, shift=mn.UP))
 
+class FifthScene(PresentationScene):
+    def construct(self):
 
         if "Unimodular" in sections:
             title = mn.Tex("Unimodularity", font_size=72)
             b_list = blist(r"A group is unimodular if the modular function has a value of 1 for every element.\vspace{-10pt}",
                            r"In a totally disconnected locally compact group we have that $\Delta(g) = \frac{s(g)}{s(g^{-1})}$\vspace{-10pt}.",
-                           r"For a group with compact-open vertex stabilisers, a unimodularity condition was derived by Bass-Kulkarni in [BK90]\vspace{-10pt}.",
+                           r"For a group with compact-open vertex stabilisers, a unimodularity condition was derived by Bass-Kulkarni in [BK90]\vspace{-11pt}.",
                            r"For (P)-closed groups, the same condition can be found by using our formula for the scale function.\vspace{-10pt}", font_size=40
                           )
 
             unimod_thm = create_paragraph(r"\textbf{Theorem} (Bass-Kulkarni): ",  r"Let $G$ be a (P)-closed group and $\Delta = (\Gamma, (X_a), (G(v)))$ its associated local action diagram. Then $G$ is unimodular if and only if for all cycles $C$ in $\Gamma$ we have that $\prod_{a \in C}|X_a| = \prod_{a \in C}|X_{\overline{a}}|$.")[0]
 
             unimod_thm[1].set_color(mn.YELLOW)
+
+            
+            temp = b_list[3][-1]
+            b_list[3].remove(temp)
+            b_list[4].submobjects.insert(0, temp)
 
 
 
@@ -1339,72 +1336,99 @@ class FourthScene(PresentationScene):
             self.play(mn.FadeOut(lad))
             self.end_fragment()
 
-        if "Future Work" in sections:
-            title = mn.Tex("Future Work", font_size=72)
+class SixthScene(PresentationScene):
+    def construct(self):
 
-            b_list = blist(r"Our formula finds the scale of translations.",
-                           r"This is enough is the group has compact vertex stabilisers.",
-                           r"If the group doesn't have compact vertex stabilisers, our formula for translations still works using Reid-Smith's theorem for local compactness [RS26].",
-                          )
+        title = mn.Tex("Isomorphisms", font_size=72)
+        b_list = blist(r"Reid-Smith showed that isomorphism classes of local action diagrams correspond to conjugacy classes of (P)-closed groups [RS26].",
+                       r"This allows us to perform enumeration of conjugacy classes of (P)-closed groups as long as the corresponding local action diagrams are finite.",
+                       r"We have enumerated local action diagrams acting in a $d$-regular tree with $k$ vertex orbits.",
+                      )
 
-            b_list_2 = blist(r"We have extended Reid-Smith's theorem for local compactness to work in all cases.",
-                           r"Using this, we can find the scale values of non-translations.",
-                           r"This depends on the scale of elements in the local-action groups."
-                          )
+        temp = b_list[1][-1]
+        b_list[1].remove(temp)
+        b_list[2].submobjects.insert(0, temp)
 
+        self.add(title)
+        self.end_fragment()
 
+        self.play(title.animate.move_to(3*mn.UP))
+        #b_list.next_to(title, mn.DOWN, 0.5)
+        self.add(b_list[1])
+        self.end_fragment()
 
-            self.add(title)
+        for i in [2, 3]:
+            self.add(b_list[i])
             self.end_fragment()
 
-            scale_title = mn.Tex("Scale of Non-translations", font_size=72).move_to(mn.UP)
-            lp_title = mn.Tex("Locally Determined Properties", font_size=72).move_to(mn.DOWN)
-
-            self.play(mn.ReplacementTransform(title, mn.VGroup(scale_title, lp_title)))
-            self.end_fragment()
-
-            a_group = mn.AnimationGroup(
-                        mn.ShrinkToCenter(lp_title),
-                        scale_title.animate.move_to(3*mn.UP)
-                    )
+        self.play(mn.FadeOut(mn.VGroup(title, b_list)), shift=mn.UP)
+        self.end_fragment()
 
 
-            self.play(a_group)
-            self.add(b_list[1])
-            self.end_fragment()
 
-            for i in [2, 3]:
-                self.add(b_list[i])
-                self.end_fragment()
+        item_1 = r"A graph isomorphism $\theta : \Gamma \to \Gamma'$ and"
+        item_2 = r"For each vertex $v$ a bijection $\theta_v : X_v \to X_{\theta(v)}$ such that $\theta_v G(v)\theta_v^{-1} = G'(\theta(v))$."
+        lad_desc = create_paragraph(r"Given two local action diagram $\Delta = (\Gamma, (X_{a}), (G(v)))$ and $\Delta' = (\Gamma', (X'_{a}), (G'(v)))$ and isomorphism between them consists of: ", font_size=42)[0].move_to(mn.UP)
 
-            first_group = mn.VGroup(scale_title, b_list)
+        b_list = blist(item_1, item_2)
+        b_list.next_to(lad_desc, mn.DOWN, 0.5)
 
-            self.play(first_group.animate.shift(4*mn.UP))
+        self.add(lad_desc)
+        self.end_fragment()
 
-            b_list_2.next_to(b_list, mn.DOWN, 0.60+np.linalg.norm(b_list[2].get_bottom()-b_list[3].get_top()))
-
-            for i in [1, 2, 3]:
-                self.add(b_list_2[i])
-                self.end_fragment()
-
-            lp_title = mn.Tex("Locally Determined Properties", font_size=72).move_to(3*mn.UP)
-
-            self.play(mn.ReplacementTransform(mn.VGroup(scale_title, b_list, b_list_2), lp_title))
-            self.end_fragment()
-
-            b_list = blist(r"A property is locally determined when $G$ satisfies that property if and only if $G^{(P)}$ satisfies it.",
-                           r"The type of group action is an example of such a property [CT23].",
-                           r"Uniscalarity is an example of a property which is not locally determined."
-                          )
-
-            for i in [1, 2, 3]:
-                self.add(b_list[i])
-                self.end_fragment()
-
-            self.play(mn.FadeOut(mn.VGroup(lp_title, b_list), shift=mn.UP))
+        for i in [1, 2]:
+            self.add(b_list[i])
             self.end_fragment()
 
 
+        lad_dot = mn.Dot(point=mn.ORIGIN)
+
+        def rotate_point(point, angle):
+            return mn.RIGHT * (point[0]*np.cos(angle) - point[1]*np.sin(angle)) + mn.UP * (point[0]*np.sin(angle) + point[1]*np.cos(angle))
+
+        bez_point1 = 2*(mn.UP + 0.5*mn.RIGHT)
+        bez_point2 = 2*(mn.UP + 0.5*mn.LEFT)
+        green_curve = mn.CubicBezier(mn.ORIGIN, bez_point1, bez_point2, mn.ORIGIN, color=mn.GREEN)
+        red_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, np.pi/3), rotate_point(bez_point2, np.pi/3), mn.ORIGIN, color=mn.RED)
+        blue_curve = mn.CubicBezier(mn.ORIGIN, rotate_point(bez_point1, -np.pi/3), rotate_point(bez_point2, -np.pi/3), mn.ORIGIN, color=mn.BLUE)
+
+        vert_label = mn.MathTex(r"C_2").next_to(lad_dot, mn.DOWN, mn.SMALL_BUFF).scale(0.75)
+        red_label = mn.MathTex(r"\{1, 2\}").move_to(mn.UP + 1.85*mn.LEFT).scale(0.75)
+        blue_label = mn.MathTex(r"\{3\}").move_to(2*mn.UP).scale(0.75)
+        green_label = mn.MathTex(r"\{4\}").move_to(mn.UP + 1.65*mn.RIGHT).scale(0.75)
+            
+        lad_1 = mn.VGroup(blue_curve.copy(), red_curve.copy(), green_curve.copy(), lad_dot.copy(), vert_label.copy(), red_label.copy(), blue_label.copy(), green_label.copy()).shift(2.5*mn.LEFT)
+
+        red_label = mn.MathTex(r"\{1\}").move_to(mn.UP + 1.85*mn.LEFT).scale(0.75)
+        blue_label = mn.MathTex(r"\{2\}").move_to(2*mn.UP).scale(0.75)
+        green_label = mn.MathTex(r"\{3, 4\}").move_to(mn.UP + 1.65*mn.RIGHT).scale(0.75)
+
+        lad_2 = mn.VGroup(blue_curve, red_curve, green_curve, lad_dot, vert_label, red_label, blue_label, green_label).shift(2.5*mn.RIGHT)
+
+        self.play(mn.ReplacementTransform(mn.VGroup(lad_desc, b_list), mn.VGroup(lad_1, lad_2)))
+        self.end_fragment()
+
+        self.play(
+                mn.ReplacementTransform(lad_1[1], lad_2[0]),
+                mn.ReplacementTransform(lad_1[2], lad_2[2]),
+                mn.ReplacementTransform(lad_1[0], lad_2[1]),
+                mn.ReplacementTransform(lad_1[3], lad_2[3]),
+                mn.ReplacementTransform(lad_1[4], lad_2[4]),
+                mn.ReplacementTransform(lad_1[5], lad_2[6]),
+                mn.ReplacementTransform(lad_1[6], lad_2[5]),
+                mn.ReplacementTransform(lad_1[7], lad_2[7]),
+                )
+        self.play(lad_2.animate.shift(2.5*mn.LEFT))
+        self.end_fragment()
+
+
+        self.play(mn.FadeOut(lad_1, shift=mn.UP), mn.FadeOut(lad_2, shift=mn.UP))
+        self.end_fragment()
+
+
+
+class SeventhScene(PresentationScene):
+    def construct(self):
 
         if "Ending" in sections:
 

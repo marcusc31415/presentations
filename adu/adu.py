@@ -239,7 +239,7 @@ class IntroScene(PresentationScene):
             self.end_fragment()
 
             self.play(title.animate.move_to(3*mn.UP))
-            b_list = create_paragraph(item(r"First introduced by J. Tits in [Tit70]."), item(r"Generalised to a family of properties in [BEW15]."), item("They are ``independence\'\' properties."), font_size=42)[0].next_to(title, mn.DOWN, 1)
+            b_list = create_paragraph(item(r"First introduced by J. Tits in [Tit70] to find examples of simple groups acting on trees."), item(r"Generalised to a family of properties in [BEW15]."), item("They are ``independence\'\' properties."), font_size=42)[0].next_to(title, mn.DOWN, 1)
             self.add(b_list[1])
             self.end_fragment()
             self.add(b_list[2])
@@ -811,7 +811,7 @@ class IntroScene(PresentationScene):
             title = mn.Tex("Group Types", font_size=72)
             b_list = blist(r"It is ``well known'' the groups acting an trees can be split into six mutually exclusives types [Ser03], [RS26].",
                            r"Reid-Smith showed how these types can be detected from a local action diagram [RS26].",
-                           r"Chijoff-Tornier showed that the type of a group and the type of its (P)-closure are the same [CT26]."
+                           r"C.-Tornier showed that the type of a group and the type of its (P)-closure are the same [CT26]."
                           )
 
             self.add(title)
@@ -859,6 +859,11 @@ class IntroScene(PresentationScene):
                            r"It is defined for all totally disconnected locally compact groups.",
                            r"We show how to compute the scale for \textbf{translations} in a (P)-closed group."
                           )
+
+
+            temp = b_list[3][0]
+            b_list[3].remove(temp)
+            b_list[2].submobjects.insert(0, temp)
 
             self.add(title)
             self.end_fragment()
@@ -1083,7 +1088,7 @@ class IntroScene(PresentationScene):
                 self.add(b_list[i])
                 self.end_fragment()
 
-            uniscalar_thm = create_paragraph(r"\textbf{Theorem} (Chijoff-Ferov-Tornier): ",  r"Let $G$ be a (P)-closed group. Then $G$ is uniscalar if and only if $G$ is either of type Horocyclic or contains a compact open normal subgroup.")[0]
+            uniscalar_thm = create_paragraph(r"\textbf{Theorem} (C.-Ferov-Tornier): ",  r"Let $G$ be a (P)-closed group. Then $G$ is uniscalar if and only if $G$ is either of type Horocyclic or contains a compact open normal subgroup.")[0]
 
             uniscalar_thm[1].set_color(mn.YELLOW)
 
@@ -1212,12 +1217,17 @@ class IntroScene(PresentationScene):
             b_list = blist(r"A group is unimodular if the modular function has a value of 1 for every element.\vspace{-10pt}",
                            r"In a totally disconnected locally compact group we have that $\Delta(g) = \frac{s(g)}{s(g^{-1})}$\vspace{-10pt}.",
                            r"For a group with compact-open vertex stabilisers, a unimodularity condition was derived by Bass-Kulkarni in [BK90]\vspace{-10pt}.",
-                           r"For (P)-closed groups, the same condition can be found by using our formula for the scale function.\vspace{-10pt}", font_size=40
+                           r"For (P)-closed groups, the same condition can be found by using our formula for the scale function. We have also reduced it to a finite condition for finite local action diagrams.\vspace{-10pt}", font_size=40
                           )
 
             unimod_thm = create_paragraph(r"\textbf{Theorem} (Bass-Kulkarni): ",  r"Let $G$ be a (P)-closed group and $\Delta = (\Gamma, (X_a), (G(v)))$ its associated local action diagram. Then $G$ is unimodular if and only if for all cycles $C$ in $\Gamma$ we have that $\prod_{a \in C}|X_a| = \prod_{a \in C}|X_{\overline{a}}|$.")[0]
 
             unimod_thm[1].set_color(mn.YELLOW)
+
+            temp = b_list[3][-1]
+            b_list[3].remove(temp)
+            b_list[4].submobjects.insert(0, temp)
+
 
 
 
@@ -1412,11 +1422,11 @@ class IntroScene(PresentationScene):
             title = mn.Tex("Future Work", font_size=72)
 
             b_list = blist(r"Our formula finds the scale of translations.",
-                           r"This is enough is the group has compact vertex stabilisers.",
+                           r"This is enough if the group has compact vertex stabilisers.",
                            r"If the group doesn't have compact vertex stabilisers, our formula for translations still works using Reid-Smith's theorem for local compactness [RS26].",
                           )
 
-            b_list_2 = blist(r"We have extended Reid-Smith's theorem for local compactness to work in all cases.",
+            b_list_2 = blist(r"We have extended Reid-Smith's theorem for local compactness to cover in all cases.",
                            r"Using this, we can find the scale values of non-translations.",
                            r"This depends on the scale of elements in the local-action groups."
                           )
@@ -1426,7 +1436,7 @@ class IntroScene(PresentationScene):
             self.add(title)
             self.end_fragment()
 
-            scale_title = mn.Tex("Scale of Non-translations", font_size=72).move_to(mn.UP)
+            scale_title = mn.Tex("Scale of Non-Translations", font_size=72).move_to(mn.UP)
             lp_title = mn.Tex("Locally Determined Properties", font_size=72).move_to(mn.DOWN)
 
             self.play(mn.ReplacementTransform(title, mn.VGroup(scale_title, lp_title)))
@@ -1441,6 +1451,11 @@ class IntroScene(PresentationScene):
             self.play(a_group)
             self.add(b_list[1])
             self.end_fragment()
+
+
+            temp = b_list[3][0]
+            b_list[3].remove(temp)
+            b_list[2].submobjects.insert(0, temp)
 
             for i in [2, 3]:
                 self.add(b_list[i])
